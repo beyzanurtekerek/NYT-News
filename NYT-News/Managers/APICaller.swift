@@ -6,3 +6,35 @@
 //
 
 import Foundation
+
+struct Constants {
+    static let API_KEY = Config.apiKey
+    static let baseURL = "https://api.nytimes.com/svc/"
+}
+
+enum APIError: Error {
+    case failedToGetData
+}
+
+class APICaller {
+    
+    static let shared = APICaller()
+    
+    func getTopStories(completion: @escaping (Result<[New], Error>) -> Void) {
+        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/home.json?api-key=\(Constants.API_KEY)") else { return }
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            do {
+                let result = try JSONDecoder().decode(NewResponse.self, from: data)
+                completion(.success(result.results))
+            } catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        task.resume()
+    }
+    
+    
+}
