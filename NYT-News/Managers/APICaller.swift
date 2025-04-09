@@ -20,12 +20,10 @@ class APICaller {
     
     static let shared = APICaller()
     
-    func getTopStories(completion: @escaping (Result<[New], Error>) -> Void) {
+    func getTopStoriesHome(completion: @escaping (Result<[New], Error>) -> Void) {
         guard let url = URL(string: "\(Constants.baseURL)topstories/v2/home.json?api-key=\(Constants.API_KEY)") else { return }
         let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
+            guard let data = data, error == nil else { return }
             do {
                 let result = try JSONDecoder().decode(NewResponse.self, from: data)
                 completion(.success(result.results))
@@ -36,5 +34,20 @@ class APICaller {
         task.resume()
     }
     
+    func getTopStoriesWorld(completion: @escaping (Result<[New], Error>) -> Void) {
+        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/world.json?api-key=\(Constants.API_KEY)") else { return }
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else { return }
+            do {
+                let result = try JSONDecoder().decode(NewResponse.self, from: data)
+                completion(.success(result.results))
+            } catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        task.resume()
+    }
+    
+    // ARTICLE SEARCH yapılacak
     
 }
