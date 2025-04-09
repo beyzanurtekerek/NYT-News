@@ -24,3 +24,5 @@ struct New: Codable {
 struct Multimedia: Codable {
     let url: String?
 }
+
+// Top Stories API - Home & World
