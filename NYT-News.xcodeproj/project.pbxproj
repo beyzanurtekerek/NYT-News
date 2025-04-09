@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D83D0E3D2DA6D2CA00114029 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = D83D0E3C2DA6D2CA00114029 /* SDWebImage */; };
+		D83D0E3F2DA6D2CA00114029 /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D83D0E3E2DA6D2CA00114029 /* SDWebImageMapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D85E25602DA6A26F00F4FC81 /* NYT-News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NYT-News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D83D0E3F2DA6D2CA00114029 /* SDWebImageMapKit in Frameworks */,
+				D83D0E3D2DA6D2CA00114029 /* SDWebImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = "NYT-News";
 			packageProductDependencies = (
+				D83D0E3C2DA6D2CA00114029 /* SDWebImage */,
+				D83D0E3E2DA6D2CA00114029 /* SDWebImageMapKit */,
 			);
 			productName = "NYT-News";
 			productReference = D85E25602DA6A26F00F4FC81 /* NYT-News.app */;
@@ -107,6 +116,9 @@
 			);
 			mainGroup = D85E25572DA6A26F00F4FC81;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D83D0E3B2DA6D2CA00114029 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D85E25612DA6A26F00F4FC81 /* Products */;
 			projectDirPath = "";
@@ -335,6 +347,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D83D0E3B2DA6D2CA00114029 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.21.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D83D0E3C2DA6D2CA00114029 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D83D0E3B2DA6D2CA00114029 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		D83D0E3E2DA6D2CA00114029 /* SDWebImageMapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D83D0E3B2DA6D2CA00114029 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImageMapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D85E25582DA6A26F00F4FC81 /* Project object */;
 }
