@@ -6,13 +6,21 @@
 //
 
 import UIKit
+import SDWebImage
+
+protocol CollectionViewTableViewCellDelegate: AnyObject {
+    // _ cell: CollectionViewTableViewCell, viewModel: detailvm
+    func collectionViewTableViewCellDidTapCell()
+}
 
 class RecommendationTableViewCell: UITableViewCell {
 
+    weak var delegate: CollectionViewTableViewCellDelegate?
+    
     static let identifier = "RecommendationTableViewCell"
     
     private let populerImageView: UIImageView = {
-       let imageView = UIImageView()
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
@@ -57,11 +65,43 @@ class RecommendationTableViewCell: UITableViewCell {
     }
     
     private func applyConstraints() {
-        // CONSTRAİNTS VERİLECEK ??
+        let populerImageViewConstraints = [
+            populerImageView.leadingAnchor .constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            populerImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            populerImageView.widthAnchor.constraint(equalToConstant: 100),
+            populerImageView.heightAnchor.constraint(equalToConstant: 100)
+        ]
+        let titleLabelConstraints = [
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            titleLabel.leadingAnchor.constraint(equalTo: populerImageView.trailingAnchor, constant: 10),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+        ]
+        let bylineLabelConstraints = [
+            bylineLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            bylineLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            bylineLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor)
+        ]
+        let dateLabelConstraints = [
+            dateLabel.topAnchor.constraint(equalTo: bylineLabel.bottomAnchor, constant: 4),
+            dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
+        ]
+        
+        NSLayoutConstraint.activate(populerImageViewConstraints)
+        NSLayoutConstraint.activate(titleLabelConstraints)
+        NSLayoutConstraint.activate(bylineLabelConstraints)
+        NSLayoutConstraint.activate(dateLabelConstraints)
     }
     
-    public func configure(with model: String) {
+    public func configure(with model: New) {
+        guard let urlString = model.multimedia?.first?.url,
+              let url = URL(string: urlString) else { return }
         
+        titleLabel.text = model.title
+        bylineLabel.text = model.byline
+        dateLabel.text = model.published_date
+        populerImageView.sd_setImage(with: url)
     }
     
 }

@@ -15,6 +15,8 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     private let articleImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 10
+        imageView.layer.masksToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         return imageView
@@ -24,22 +26,22 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 16)
         label.numberOfLines = 2
-        label.textColor = .black
+        label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let abstractLabel: UILabel = {
-      let label = UILabel()
+        let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 4
-        label.textColor = .darkGray
+        label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let dateLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -47,9 +49,9 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     }()
     
     private let sectionLabel: UILabel = {
-      let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .lightGray
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.textColor = .systemPink
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -60,6 +62,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(abstractLabel)
         contentView.addSubview(dateLabel)
+        contentView.addSubview(sectionLabel)
         
         applyConstraints()
     }
@@ -74,20 +77,61 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     }
     
     public func configure(with model: New) {
-        guard let firstMedia = model.multimedia?.first,
-              let urlString = firstMedia.url,
-              let url = URL(string: urlString) else { return }
-        
-        articleImageView.sd_setImage(with: url, completed: nil)
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
         dateLabel.text = model.published_date
+        sectionLabel.text = model.section
+        
+        if let imageUrlString = model.multimedia?.first?.url,
+           let imageUrl = URL(string: imageUrlString) {
+            URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        self.articleImageView.image = UIImage(data: data)
+                    }
+                }
+            }
+            .resume()
+        } else {
+            articleImageView.image = UIImage(named: "placeholder")
+        }
     }
     
-    // CONSTRAİNT VERİLECEK ??
     private func applyConstraints() {
-        //let articleImageViewConstraints = [ ]
-            
+        let articleImageViewConstraints = [
+            articleImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            articleImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            articleImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            articleImageView.heightAnchor.constraint(equalToConstant: 300)
+        ]
+        let sectionLabelConstraints = [
+//            sectionLabel.bottomAnchor.constraint(equalTo: dateLabel.topAnchor, constant: 10),
+            sectionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            sectionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+        ]
+        let dateLabelConstraints = [
+            dateLabel.topAnchor.constraint(equalTo: sectionLabel.bottomAnchor, constant: 10),
+            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+        ]
+        let titleLabelConstraints = [
+            titleLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 4),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+        ]
+        let abstractLabelConstraints = [
+            abstractLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            abstractLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            abstractLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            abstractLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+        ]
+        
+        
+        NSLayoutConstraint.activate(articleImageViewConstraints)
+        NSLayoutConstraint.activate(titleLabelConstraints)
+        NSLayoutConstraint.activate(abstractLabelConstraints)
+        NSLayoutConstraint.activate(dateLabelConstraints)
+        NSLayoutConstraint.activate(sectionLabelConstraints)
     }
     
 }
