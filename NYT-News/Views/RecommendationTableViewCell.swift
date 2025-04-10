@@ -16,19 +16,21 @@ protocol CollectionViewTableViewCellDelegate: AnyObject {
 class RecommendationTableViewCell: UITableViewCell {
 
     weak var delegate: CollectionViewTableViewCellDelegate?
-    
+
     static let identifier = "RecommendationTableViewCell"
     
     private let populerImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 4
+        imageView.layer.masksToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         return imageView
     }()
     
     private let bylineLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
@@ -36,7 +38,8 @@ class RecommendationTableViewCell: UITableViewCell {
     }()
     
     private let titleLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
+        label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.boldSystemFont(ofSize: 14)
         return label
@@ -66,23 +69,23 @@ class RecommendationTableViewCell: UITableViewCell {
     
     private func applyConstraints() {
         let populerImageViewConstraints = [
-            populerImageView.leadingAnchor .constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            populerImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             populerImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            populerImageView.widthAnchor.constraint(equalToConstant: 100),
-            populerImageView.heightAnchor.constraint(equalToConstant: 100)
-        ]
-        let titleLabelConstraints = [
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            titleLabel.leadingAnchor.constraint(equalTo: populerImageView.trailingAnchor, constant: 10),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+            populerImageView.widthAnchor.constraint(equalToConstant: 90),
+            populerImageView.heightAnchor.constraint(equalToConstant: 90)
         ]
         let bylineLabelConstraints = [
-            bylineLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            bylineLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             bylineLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             bylineLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor)
         ]
+        let titleLabelConstraints = [
+            titleLabel.topAnchor.constraint(equalTo: bylineLabel.bottomAnchor, constant: 4),
+            titleLabel.leadingAnchor.constraint(equalTo: populerImageView.trailingAnchor, constant: 10),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+        ]
         let dateLabelConstraints = [
-            dateLabel.topAnchor.constraint(equalTo: bylineLabel.bottomAnchor, constant: 4),
+            dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)

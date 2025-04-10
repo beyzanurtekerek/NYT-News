@@ -8,6 +8,7 @@
 import UIKit
 import SDWebImage
 
+
 class BreakingNewsCollectionViewCell: UICollectionViewCell {
     
     static let identifier = "BreakingNewsCollectionViewCell"
@@ -43,15 +44,21 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .lightGray
+        label.textColor = .white
+        label.layer.cornerRadius = 3
+        label.layer.masksToBounds = true
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = UIColor.systemGray.withAlphaComponent(0.6)
         return label
     }()
     
     private let sectionLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 16)
-        label.textColor = .systemPink
+        label.textColor = .white
+        label.layer.cornerRadius = 3
+        label.layer.masksToBounds = true
+        label.backgroundColor = UIColor.systemPink.withAlphaComponent(0.6)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -105,14 +112,13 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
             articleImageView.heightAnchor.constraint(equalToConstant: 300)
         ]
         let sectionLabelConstraints = [
-//            sectionLabel.bottomAnchor.constraint(equalTo: dateLabel.topAnchor, constant: 10),
             sectionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            sectionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+            sectionLabel.trailingAnchor.constraint(equalTo: sectionLabel.trailingAnchor, constant: -8)
         ]
         let dateLabelConstraints = [
             dateLabel.topAnchor.constraint(equalTo: sectionLabel.bottomAnchor, constant: 10),
             dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+            dateLabel.trailingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: -8)
         ]
         let titleLabelConstraints = [
             titleLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 4),
