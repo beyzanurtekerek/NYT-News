@@ -97,7 +97,7 @@ class RecommendationTableViewCell: UITableViewCell {
         
         titleLabel.text = model.title
         bylineLabel.text = "• \(model.byline ?? "Unknown Author")"
-        dateLabel.text = DateFormatterUtils.formattedDate(from: model.published_date ?? "")
+        dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "")
         populerImageView.sd_setImage(with: url)
     }
     

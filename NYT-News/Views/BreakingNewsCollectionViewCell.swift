@@ -88,7 +88,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     public func configure(with model: New) {
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
-        dateLabel.text = DateFormatterUtils.formattedDate(from: model.published_date ?? "")
+        dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "")
         sectionLabel.text = model.section?.uppercased()
         
         if let imageUrlString = model.multimedia?.first?.url,

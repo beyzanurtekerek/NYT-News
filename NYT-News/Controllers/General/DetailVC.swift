@@ -77,6 +77,15 @@ class DetailVC: UIViewController {
         return button
     }()
     
+    private let saveButton: UIButton = {
+        let button = UIButton()
+        let image = UIImage(systemName: "bookmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))
+        button.setImage(image, for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -85,6 +94,7 @@ class DetailVC: UIViewController {
         view.addSubview(detailImageView)
         view.addSubview(infoContainerView)
         view.addSubview(sectionLabel)
+        view.addSubview(saveButton)
         
         infoContainerView.addSubview(titleLabel)
         infoContainerView.addSubview(bylineLabel)
@@ -93,10 +103,15 @@ class DetailVC: UIViewController {
         
         applyConstraints()
         setupReadMoreButton()
+        setupSaveButton()
     }
 
     private func setupReadMoreButton() {
         readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
+    }
+    
+    private func setupSaveButton() {
+        saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
     }
     
     @objc private func readMoreButtonClicked() {
@@ -105,7 +120,31 @@ class DetailVC: UIViewController {
         UIApplication.shared.open(url)
     }
     
+    @objc private func saveButtonClicked() {
+        // İSLEMLER
+        
+        saveButton.isSelected.toggle()
+        
+        if saveButton.isSelected {
+            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))?
+                .withRenderingMode(.alwaysOriginal)
+            saveButton.tintColor = .white
+            saveButton.setImage(filledImage, for: .normal)
+        } else {
+            let emptyImage = UIImage(systemName: "bookmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))?
+                .withRenderingMode(.alwaysOriginal)
+            saveButton.tintColor = .white
+            saveButton.setImage(emptyImage, for: .normal)
+        }
+    }
+    
     private func applyConstraints() {
+        let saveButtonconstraints = [
+            saveButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 70),
+            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            saveButton.widthAnchor.constraint(equalToConstant: 60),
+            saveButton.heightAnchor.constraint(equalToConstant: 60)
+        ]
         let infoContainerViewConstraints = [
             infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             infoContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -144,6 +183,7 @@ class DetailVC: UIViewController {
             readMoreButton.bottomAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: -50)
         ]
         
+        NSLayoutConstraint.activate(saveButtonconstraints)
         NSLayoutConstraint.activate(infoContainerViewConstraints)
         NSLayoutConstraint.activate(detailImageViewConstraints)
         NSLayoutConstraint.activate(sectionLabelConstraints)
@@ -170,3 +210,5 @@ class DetailVC: UIViewController {
     
     
 }
+
+//    .symbolEffect(.bounce)

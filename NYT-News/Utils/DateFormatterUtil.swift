@@ -7,7 +7,7 @@
 
 import Foundation
 
-class DateFormatterUtils {
+class DateFormatterUtil {
     static func formattedDate(from string: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
