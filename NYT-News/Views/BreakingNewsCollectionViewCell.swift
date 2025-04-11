@@ -54,8 +54,8 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private let sectionLabel: UILabel = {
-        let label = UILabel()
+    private let sectionLabel: PaddingLabel = {
+        let label = PaddingLabel()
         label.font = UIFont.boldSystemFont(ofSize: 12)
         label.textColor = .white
         label.layer.cornerRadius = 3
@@ -64,17 +64,6 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private func formattedDate(from string: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        if let date = formatter.date(from: string) {
-            formatter.dateFormat = "dd MMM yyyy - HH:mm:ss"
-            return formatter.string(from: date)
-        }
-        return string
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -99,7 +88,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     public func configure(with model: New) {
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
-        dateLabel.text = formattedDate(from: model.published_date ?? "")
+        dateLabel.text = DateFormatterUtils.formattedDate(from: model.published_date ?? "")
         sectionLabel.text = model.section?.uppercased()
         
         if let imageUrlString = model.multimedia?.first?.url,

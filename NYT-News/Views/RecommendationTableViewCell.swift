@@ -45,17 +45,6 @@ class RecommendationTableViewCell: UITableViewCell {
         label.textColor = .lightGray
         return label
     }()
-    
-    private func formattedDate(from string: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        if let date = formatter.date(from: string) {
-            formatter.dateFormat = "dd MMM yyyy - HH:mm:ss"
-            return formatter.string(from: date)
-        }
-        return string
-    }
 
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -108,7 +97,7 @@ class RecommendationTableViewCell: UITableViewCell {
         
         titleLabel.text = model.title
         bylineLabel.text = "• \(model.byline ?? "Unknown Author")"
-        dateLabel.text = formattedDate(from: model.published_date ?? "")
+        dateLabel.text = DateFormatterUtils.formattedDate(from: model.published_date ?? "")
         populerImageView.sd_setImage(with: url)
     }
     

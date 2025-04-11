@@ -176,6 +176,13 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
         return cell
     }
 
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedNews = news[indexPath.row]
+        let vc = DetailVC()
+        vc.news = selectedNews
+        vc.configure(with: selectedNews)
+        navigationController?.pushViewController(vc, animated: true)
+    }
     
 }
 
@@ -187,7 +194,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard news.count > indexPath.row else {
-            return UITableViewCell() // Eğer veri yoksa boş hücre döndür
+            return UITableViewCell()
         }
         guard let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationTableViewCell.identifier, for: indexPath) as? RecommendationTableViewCell else {
             return UITableViewCell()
@@ -203,5 +210,9 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         navigationController?.navigationBar.alpha = 1
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //
     }
 }
