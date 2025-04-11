@@ -199,14 +199,6 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        let defaultOffset = view.safeAreaInsets.top
-//        let offset = scrollView.contentOffset.y + defaultOffset
         navigationController?.navigationBar.alpha = 1
-    }
-}
-
-extension HomeVC: CollectionViewTableViewCellDelegate {
-    func collectionViewTableViewCellDidTapCell() {
-         // protocol ile birlitke yaz
     }
 }

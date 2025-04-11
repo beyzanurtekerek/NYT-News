@@ -8,11 +8,6 @@
 import UIKit
 import SDWebImage
 
-protocol CollectionViewTableViewCellDelegate: AnyObject {
-    // _ cell: CollectionViewTableViewCell, viewModel: detailvm
-    func collectionViewTableViewCellDidTapCell()
-}
-
 class RecommendationTableViewCell: UITableViewCell {
 
     weak var delegate: CollectionViewTableViewCellDelegate?
