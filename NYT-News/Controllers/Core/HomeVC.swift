@@ -24,7 +24,7 @@ class HomeVC: UIViewController {
         layout.itemSize = CGSize(width: 380, height: 250)
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 0)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(BreakingNewsCollectionViewCell.self, forCellWithReuseIdentifier: BreakingNewsCollectionViewCell.identifier)
         return collectionView
@@ -55,10 +55,14 @@ class HomeVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        view.addSubview(breakingNewsCollectionView)
-        view.addSubview(recommendationTableView)
+        
         view.addSubview(breakingNewsHeader)
+        view.addSubview(breakingNewsCollectionView)
         view.addSubview(recommendationHeader)
+        view.addSubview(recommendationTableView)
+        
+        breakingNewsCollectionView.backgroundColor = .clear
+        recommendationTableView.backgroundColor = .clear
         
         breakingNewsCollectionView.delegate = self
         breakingNewsCollectionView.dataSource = self
@@ -85,13 +89,13 @@ class HomeVC: UIViewController {
     
     private func applyConstraints() {
         let breakingNewsHeaderConstraints = [
-            breakingNewsHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            breakingNewsHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 110),
             breakingNewsHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             breakingNewsHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             breakingNewsHeader.heightAnchor.constraint(equalToConstant: 30)
         ]
         let recommendationHeaderConstraints = [
-            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 16),
+            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 30),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             recommendationHeader.heightAnchor.constraint(equalToConstant: 30)
@@ -190,7 +194,6 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
         }
         let model = news[indexPath.row]
         cell.configure(with: model)
-        cell.delegate = self
         return cell
     }
     

@@ -10,8 +10,6 @@ import SDWebImage
 
 class RecommendationTableViewCell: UITableViewCell {
 
-    weak var delegate: CollectionViewTableViewCellDelegate?
-
     static let identifier = "RecommendationTableViewCell"
     
     private let populerImageView: UIImageView = {
@@ -76,7 +74,7 @@ class RecommendationTableViewCell: UITableViewCell {
     
     private func applyConstraints() {
         let populerImageViewConstraints = [
-            populerImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            populerImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             populerImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             populerImageView.widthAnchor.constraint(equalToConstant: 90),
             populerImageView.heightAnchor.constraint(equalToConstant: 90)

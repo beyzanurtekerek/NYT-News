@@ -28,6 +28,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.boldSystemFont(ofSize: 16)
         label.numberOfLines = 2
         label.textColor = .white
+        label.shadowColor = UIColor.black.withAlphaComponent(0.3)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -37,6 +38,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 4
         label.textColor = .white
+        label.shadowColor = UIColor.black.withAlphaComponent(0.3)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -63,6 +65,17 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private func formattedDate(from string: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        if let date = formatter.date(from: string) {
+            formatter.dateFormat = "dd MMM yyyy - HH:mm:ss"
+            return formatter.string(from: date)
+        }
+        return string
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(articleImageView)
@@ -86,7 +99,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     public func configure(with model: New) {
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
-        dateLabel.text = model.published_date
+        dateLabel.text = formattedDate(from: model.published_date ?? "")
         sectionLabel.text = model.section?.uppercased()
         
         if let imageUrlString = model.multimedia?.first?.url,
