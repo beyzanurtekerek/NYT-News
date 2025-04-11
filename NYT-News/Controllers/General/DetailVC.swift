@@ -91,8 +91,19 @@ class DetailVC: UIViewController {
         infoContainerView.addSubview(readMoreButton)
         
         applyConstraints()
+        setupReadMoreButton()
     }
 
+    private func setupReadMoreButton() {
+        readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
+    }
+    
+    @objc private func readMoreButtonClicked() {
+        guard let urlString = news?.url,
+              let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url)
+    }
+    
     private func applyConstraints() {
         let infoContainerViewConstraints = [
             infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
