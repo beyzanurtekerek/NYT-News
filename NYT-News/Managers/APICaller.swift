@@ -34,8 +34,8 @@ class APICaller {
         task.resume()
     }
     
-    func getTopStoriesWorld(completion: @escaping (Result<[New], Error>) -> Void) {
-        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/world.json?api-key=\(Constants.API_KEY)") else { return }
+    func getTopStoriesTech(completion: @escaping (Result<[New], Error>) -> Void) {
+        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/technology.json?api-key=\(Constants.API_KEY)") else { return }
         let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
             guard let data = data, error == nil else { return }
             do {

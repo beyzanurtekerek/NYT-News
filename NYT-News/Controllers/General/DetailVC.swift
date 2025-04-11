@@ -53,6 +53,7 @@ class DetailVC: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 15)
+        label.numberOfLines = 2
         label.textColor = .lightGray
         return label
     }()
@@ -109,13 +110,13 @@ class DetailVC: UIViewController {
             infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             infoContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             infoContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            infoContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3)
+            infoContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.31)
         ]
         let detailImageViewConstraints = [
             detailImageView.topAnchor.constraint(equalTo: view.topAnchor),
             detailImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             detailImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            detailImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            detailImageView.bottomAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 20)
         ]
         let sectionLabelConstraints = [
             sectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -129,7 +130,7 @@ class DetailVC: UIViewController {
         let bylineLabelConstraints = [
             bylineLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             bylineLabel.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 16),
-            bylineLabel.trailingAnchor.constraint(equalTo: bylineLabel.trailingAnchor)
+            bylineLabel.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -16)
         ]
         let abstractLabelConstraints = [
             abstractLabel.topAnchor.constraint(equalTo: bylineLabel.bottomAnchor, constant: 10),

@@ -13,10 +13,11 @@ enum Sections: Int {
 }
 
 class HomeVC: UIViewController {
-
+    
     let sectionTitles: [String] = ["Breaking News", "Recommendation"]
     
-    private var news: [New] = [New]()
+    private var breakingNews: [New] = [New]()
+    private var recommendations: [New] = [New]()
     
     private let breakingNewsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -104,12 +105,12 @@ class HomeVC: UIViewController {
         NSLayoutConstraint.activate(recommendationHeaderConstraints)
         NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
     }
-
+    
     func fetchBreakingNews() {
         APICaller.shared.getTopStoriesHome { [weak self] result in
             switch result {
             case .success(let newsData):
-                self?.news = newsData
+                self?.breakingNews = newsData
                 DispatchQueue.main.async {
                     self?.breakingNewsCollectionView.reloadData()
                 }
@@ -120,10 +121,10 @@ class HomeVC: UIViewController {
     }
     
     func fetchRecommendations() {
-        APICaller.shared.getTopStoriesWorld { [weak self] result in
+        APICaller.shared.getTopStoriesTech { [weak self] result in
             switch result {
             case .success(let recommendationData):
-                self?.news = recommendationData
+                self?.recommendations = recommendationData
                 DispatchQueue.main.async {
                     self?.recommendationTableView.reloadData()
                 }
@@ -133,41 +134,18 @@ class HomeVC: UIViewController {
         }
     }
     
-    private func configureNavbar() {
-        let titleLabel = UILabel()
-        titleLabel.text = "The New York Times"
-        titleLabel.font = UIFont(name: "Times New Roman", size: 30)
-        titleLabel.textColor = .label
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        let titleBarButtonItem = UIBarButtonItem(customView: titleLabel)
-        
-        let menuImage = UIImage(systemName: "line.3.horizontal")
-        let menuButton = UIBarButtonItem(image: menuImage, style: .done, target: self, action: #selector(menuButtonClicked))
-        
-        navigationItem.leftBarButtonItem = titleBarButtonItem
-        navigationItem.rightBarButtonItem = menuButton
-        
-        navigationController?.navigationBar.tintColor = .label
-        
-    }
-    
-    @objc func menuButtonClicked() {
-        // İSLEMLER
-        print("hamburger menu button clicked...")
-    }
 }
 
 extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return news.count
+        return breakingNews.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BreakingNewsCollectionViewCell.identifier, for: indexPath) as? BreakingNewsCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let model = news[indexPath.row]
+        let model = breakingNews[indexPath.row]
         cell.configure(with: model)
         
         cell.contentView.layer.cornerRadius = 10
@@ -177,7 +155,7 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedNews = news[indexPath.row]
+        let selectedNews = breakingNews[indexPath.row]
         let vc = DetailVC()
         vc.news = selectedNews
         vc.configure(with: selectedNews)
@@ -189,23 +167,23 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
 extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return news.count
+        return recommendations.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard news.count > indexPath.row else {
+        guard recommendations.count > indexPath.row else {
             return UITableViewCell()
         }
         guard let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationTableViewCell.identifier, for: indexPath) as? RecommendationTableViewCell else {
             return UITableViewCell()
         }
-        let model = news[indexPath.row]
+        let model = recommendations[indexPath.row]
         cell.configure(with: model)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        return 130
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -213,6 +191,10 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //
+        let selectedNews = recommendations[indexPath.row]
+        let vc = DetailVC()
+        vc.news = selectedNews
+        vc.configure(with: selectedNews)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

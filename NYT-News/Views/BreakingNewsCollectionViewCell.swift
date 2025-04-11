@@ -43,8 +43,8 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private let dateLabel: UILabel = {
-        let label = UILabel()
+    private let dateLabel: PaddingLabel = {
+        let label = PaddingLabel()
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .white
         label.layer.cornerRadius = 3

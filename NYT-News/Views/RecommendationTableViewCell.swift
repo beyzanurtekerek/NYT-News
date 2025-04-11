@@ -65,21 +65,21 @@ class RecommendationTableViewCell: UITableViewCell {
         let populerImageViewConstraints = [
             populerImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             populerImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            populerImageView.widthAnchor.constraint(equalToConstant: 90),
-            populerImageView.heightAnchor.constraint(equalToConstant: 90)
+            populerImageView.widthAnchor.constraint(equalToConstant: 100),
+            populerImageView.heightAnchor.constraint(equalToConstant: 100)
         ]
         let bylineLabelConstraints = [
-            bylineLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            bylineLabel.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -10),
             bylineLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             bylineLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor)
         ]
         let titleLabelConstraints = [
-            titleLabel.topAnchor.constraint(equalTo: bylineLabel.bottomAnchor, constant: 4),
+            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: populerImageView.trailingAnchor, constant: 10),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ]
         let dateLabelConstraints = [
-            dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
