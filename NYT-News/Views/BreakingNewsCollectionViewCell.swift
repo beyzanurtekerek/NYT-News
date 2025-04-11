@@ -54,11 +54,11 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     
     private let sectionLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.font = UIFont.boldSystemFont(ofSize: 12)
         label.textColor = .white
         label.layer.cornerRadius = 3
         label.layer.masksToBounds = true
-        label.backgroundColor = UIColor.systemPink.withAlphaComponent(0.6)
+        label.backgroundColor = UIColor.red.withAlphaComponent(0.6)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -87,7 +87,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
         dateLabel.text = model.published_date
-        sectionLabel.text = model.section
+        sectionLabel.text = model.section?.uppercased()
         
         if let imageUrlString = model.multimedia?.first?.url,
            let imageUrl = URL(string: imageUrlString) {

@@ -52,7 +52,6 @@ class HomeVC: UIViewController {
         return label
     }()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -133,7 +132,7 @@ class HomeVC: UIViewController {
     private func configureNavbar() {
         let titleLabel = UILabel()
         titleLabel.text = "The New York Times"
-        titleLabel.font = UIFont(name: "Times New Roman", size: 27)
+        titleLabel.font = UIFont(name: "Times New Roman", size: 30)
         titleLabel.textColor = .label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
