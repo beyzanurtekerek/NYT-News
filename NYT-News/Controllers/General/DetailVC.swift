@@ -12,6 +12,50 @@ class DetailVC: UIViewController {
 
     var news: New?
 
+    private let customNavBar: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let navSaveButton: UIButton = {
+        let button = UIButton()
+        let config = UIImage.SymbolConfiguration(pointSize: 25)
+        let image = UIImage(systemName: "bookmark", withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let navBackButton: UIButton = {
+        let button = UIButton()
+        let config = UIImage.SymbolConfiguration(pointSize: 30)
+        button.setImage(UIImage(systemName: "chevron.left", withConfiguration: config), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let navBackButtonContainer: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .light)
+        let view = UIVisualEffectView(effect: blurEffect)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 25
+        return view
+    }()
+
+    private let navSaveButtonContainer: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .light)
+        let view = UIVisualEffectView(effect: blurEffect)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 25
+        return view
+    }()
+    
     private let infoContainerView: UIView = {
        let view = UIView()
         view.backgroundColor = .systemBackground
@@ -35,7 +79,7 @@ class DetailVC: UIViewController {
         label.textColor = .white
         label.layer.cornerRadius = 5
         label.layer.masksToBounds = true
-        label.backgroundColor = .systemMint
+        label.backgroundColor = .systemCyan
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -71,17 +115,8 @@ class DetailVC: UIViewController {
         let button = UIButton()
         button.setTitle("Read More", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemMint
-        button.layer.cornerRadius = 12
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let saveButton: UIButton = {
-        let button = UIButton()
-        let image = UIImage(systemName: "bookmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))
-        button.setImage(image, for: .normal)
-        button.tintColor = .white
+        button.backgroundColor = .systemCyan
+        button.layer.cornerRadius = 20
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -90,11 +125,18 @@ class DetailVC: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         self.tabBarController?.tabBar.isHidden = true
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         view.addSubview(detailImageView)
         view.addSubview(infoContainerView)
         view.addSubview(sectionLabel)
-        view.addSubview(saveButton)
+        view.addSubview(customNavBar)
+        
+        customNavBar.addSubview(navBackButtonContainer)
+        customNavBar.addSubview(navSaveButtonContainer)
+
+        navBackButtonContainer.contentView.addSubview(navBackButton)
+        navSaveButtonContainer.contentView.addSubview(navSaveButton)
         
         infoContainerView.addSubview(titleLabel)
         infoContainerView.addSubview(bylineLabel)
@@ -103,47 +145,70 @@ class DetailVC: UIViewController {
         
         applyConstraints()
         setupReadMoreButton()
-        setupSaveButton()
+        setupNavBar()
+
     }
 
+    @objc private func didTapBack() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc private func didTapSave() {
+        // islemler
+        print("save tıklandı")
+        let config = UIImage.SymbolConfiguration(pointSize: 25)
+        if navSaveButton.currentImage == UIImage(systemName: "bookmark", withConfiguration: config) {
+            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: config)
+            navSaveButton.setImage(filledImage, for: .normal)
+        } else {
+            let image = UIImage(systemName: "bookmark", withConfiguration: config)
+            navSaveButton.setImage(image, for: .normal)
+        }
+    }
+    
+    private func setupNavBar() {
+        navSaveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
+        navBackButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+    }
+    
     private func setupReadMoreButton() {
         readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
     }
     
-    private func setupSaveButton() {
-        saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
-    }
-    
+
     @objc private func readMoreButtonClicked() {
         guard let urlString = news?.url,
               let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url)
     }
     
-    @objc private func saveButtonClicked() {
-        // İSLEMLER
-        
-        saveButton.isSelected.toggle()
-        
-        if saveButton.isSelected {
-            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))?
-                .withRenderingMode(.alwaysOriginal)
-            saveButton.tintColor = .white
-            saveButton.setImage(filledImage, for: .normal)
-        } else {
-            let emptyImage = UIImage(systemName: "bookmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25))?
-                .withRenderingMode(.alwaysOriginal)
-            saveButton.tintColor = .white
-            saveButton.setImage(emptyImage, for: .normal)
-        }
-    }
     
     private func applyConstraints() {
-        let saveButtonconstraints = [
-            saveButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 70),
-            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            saveButton.widthAnchor.constraint(equalToConstant: 60),
-            saveButton.heightAnchor.constraint(equalToConstant: 60)
+        let customNavBarConstraints = [
+            customNavBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            customNavBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            customNavBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            customNavBar.heightAnchor.constraint(equalToConstant: 40)
+        ]
+        let navSaveButtonConstraints = [
+            navSaveButton.centerXAnchor.constraint(equalTo: navSaveButtonContainer.contentView.centerXAnchor),
+            navSaveButton.centerYAnchor.constraint(equalTo: navSaveButtonContainer.contentView.centerYAnchor)
+        ]
+        let navBackButtonConstraints = [
+            navBackButton.centerXAnchor.constraint(equalTo: navBackButtonContainer.contentView.centerXAnchor),
+            navBackButton.centerYAnchor.constraint(equalTo: navBackButtonContainer.contentView.centerYAnchor)
+        ]
+        let navBackButtonContainerConstraints = [
+            navBackButtonContainer.leadingAnchor.constraint(equalTo: customNavBar.leadingAnchor, constant: 20),
+            navBackButtonContainer.centerYAnchor.constraint(equalTo: customNavBar.centerYAnchor),
+            navBackButtonContainer.widthAnchor.constraint(equalToConstant: 50),
+            navBackButtonContainer.heightAnchor.constraint(equalToConstant: 50)
+        ]
+        let navSaveButtonContainerConstraints = [
+            navSaveButtonContainer.trailingAnchor.constraint(equalTo: customNavBar.trailingAnchor, constant: -20),
+            navSaveButtonContainer.centerYAnchor.constraint(equalTo: customNavBar.centerYAnchor),
+            navSaveButtonContainer.widthAnchor.constraint(equalToConstant: 50),
+            navSaveButtonContainer.heightAnchor.constraint(equalToConstant: 50)
         ]
         let infoContainerViewConstraints = [
             infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -179,11 +244,15 @@ class DetailVC: UIViewController {
         let readMoreButtonConstraints = [
             readMoreButton.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 16),
             readMoreButton.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -16),
-            readMoreButton.heightAnchor.constraint(equalToConstant: 40),
+            readMoreButton.heightAnchor.constraint(equalToConstant: 42),
             readMoreButton.bottomAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: -50)
         ]
         
-        NSLayoutConstraint.activate(saveButtonconstraints)
+        NSLayoutConstraint.activate(customNavBarConstraints)
+        NSLayoutConstraint.activate(navSaveButtonConstraints)
+        NSLayoutConstraint.activate(navBackButtonConstraints)
+        NSLayoutConstraint.activate(navSaveButtonContainerConstraints)
+        NSLayoutConstraint.activate(navBackButtonContainerConstraints)
         NSLayoutConstraint.activate(infoContainerViewConstraints)
         NSLayoutConstraint.activate(detailImageViewConstraints)
         NSLayoutConstraint.activate(sectionLabelConstraints)
@@ -210,5 +279,3 @@ class DetailVC: UIViewController {
     
     
 }
-
-//    .symbolEffect(.bounce)
