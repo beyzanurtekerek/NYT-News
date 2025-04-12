@@ -1,5 +1,5 @@
 //
-//  DataPersistenceManager.swift
+//  DataPersistentManager.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 12.04.2025.
@@ -31,6 +31,7 @@ class DataPersistenceManager {
         item.byline = model.byline
         item.published_date = model.published_date
         item.section = model.section
+        item.imageUrl = model.multimedia?.first?.url ?? ""
         
         do {
             try context.save()
