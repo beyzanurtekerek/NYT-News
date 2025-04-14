@@ -214,7 +214,7 @@ class DetailVC: UIViewController {
             infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             infoContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             infoContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            infoContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.31)
+            infoContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.32)
         ]
         let detailImageViewConstraints = [
             detailImageView.topAnchor.constraint(equalTo: view.topAnchor),

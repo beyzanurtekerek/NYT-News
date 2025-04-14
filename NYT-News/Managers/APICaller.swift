@@ -48,6 +48,8 @@ class APICaller {
         task.resume()
     }
     
-    // ARTICLE SEARCH yapılacak
+    func search(with query: String, completion: @escaping (Result<[New], Error>) -> Void) {
+        
+    }
     
 }
