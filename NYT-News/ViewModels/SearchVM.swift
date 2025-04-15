@@ -19,18 +19,9 @@ struct Doc: Codable {
     let abstract: String?
     let byline: Byline
     let multimedia: SearchMultimedia
-    let pubDate: String?
+    let pub_date: String?
     let headline: Headline
-    let sectionName: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case abstract
-        case byline
-        case multimedia
-        case pubDate = "pub_date"
-        case headline
-        case sectionName = "section_name"
-    }
+    let section_name: String?
 }
 
 struct Byline: Codable {
