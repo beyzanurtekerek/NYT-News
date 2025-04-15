@@ -48,8 +48,19 @@ class APICaller {
         task.resume()
     }
     
-    func search(with query: String, completion: @escaping (Result<[New], Error>) -> Void) {
-        
+    func search(with query: String, completion: @escaping (Result<[Doc], Error>) -> Void) {
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        guard let url = URL(string: "\(Constants.baseURL)search/v2/articlesearch.json?q=\(query)&api-key=\(Constants.API_KEY)") else { return }
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else { return }
+            do {
+                let results = try JSONDecoder().decode(SearchResponse.self, from: data)
+                completion(.success(results.response.docs))
+            } catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        task.resume()
     }
     
 }
