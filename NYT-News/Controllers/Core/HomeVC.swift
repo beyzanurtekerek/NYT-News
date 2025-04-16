@@ -107,10 +107,10 @@ class HomeVC: UIViewController {
             breakingNewsHeader.heightAnchor.constraint(equalToConstant: 30)
         ]
         let recommendationHeaderConstraints = [
-            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 30),
+            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 50),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            recommendationHeader.heightAnchor.constraint(equalToConstant: 30)
+            recommendationHeader.heightAnchor.constraint(equalToConstant: 15)
         ]
         
         NSLayoutConstraint.activate(recommendationHeaderConstraints)
