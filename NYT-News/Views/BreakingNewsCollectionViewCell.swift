@@ -85,22 +85,22 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         articleImageView.frame = contentView.bounds
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        articleImageView.image = nil
+    }
+    
     public func configure(with model: New) {
+        articleImageView.image = nil
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
         dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "")
         sectionLabel.text = model.section?.uppercased()
-        
+
         if let imageUrlString = model.multimedia?.first?.url,
            let imageUrl = URL(string: imageUrlString) {
-            URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
-                if let data = data {
-                    DispatchQueue.main.async {
-                        self.articleImageView.image = UIImage(data: data)
-                    }
-                }
-            }
-            .resume()
+            
+            articleImageView.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "placeholder"))
         } else {
             articleImageView.image = UIImage(named: "placeholder")
         }
