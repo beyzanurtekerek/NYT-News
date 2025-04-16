@@ -11,7 +11,7 @@ class SearchResultsVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        print("search result sayfası acıldı")
     }
 
 }

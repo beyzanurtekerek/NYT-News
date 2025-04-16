@@ -10,20 +10,37 @@ import UIKit
 class SearchVC: UIViewController {
     
     private var searchNews: [New] = [New]()
+    private var searchResults: [Doc] = [Doc]()
+    private let categories = [
+        "World",
+        "Technology",
+        "Business",
+        "Sports",
+        "Science",
+        "Health",
+        "Arts",
+        "Politics",
+        "Travel",
+        "Style"
+    ]
+    private var selectedCategoryIndex = 0
+
     
     private let categoryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-//        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.itemSize = CGSize(width: 100, height: 30)
         layout.minimumInteritemSpacing = 20
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
 
     private let discoverCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-//        layout.itemSize = CGSize(width: 300, height: 350)
+        layout.itemSize = CGSize(width: 300, height: 350)
         layout.minimumInteritemSpacing = 20
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -39,7 +56,7 @@ class SearchVC: UIViewController {
         return label
     }()
     
-    private let descriptionLabel: UILabel = {
+    public let descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Find the latest news articles"
         label.font = UIFont.systemFont(ofSize: 16)
@@ -56,10 +73,7 @@ class SearchVC: UIViewController {
         controller.hidesNavigationBarDuringPresentation = false
         controller.obscuresBackgroundDuringPresentation = false
         return controller
-    }()
-    
-    
-    
+    }()    
     
     
     
@@ -67,6 +81,8 @@ class SearchVC: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
+        view.addSubview(categoryCollectionView)
+        view.addSubview(discoverCollectionView)
         view.addSubview(discoverHeaderLabel)
         view.addSubview(descriptionLabel)
         view.addSubview(searchController.searchBar)
@@ -75,9 +91,30 @@ class SearchVC: UIViewController {
         categoryCollectionView.dataSource = self
         discoverCollectionView.delegate = self
         discoverCollectionView.dataSource = self
+        searchController.searchResultsUpdater = self
         
         configureNavbar()
         applyConstraints()
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let padding: CGFloat = 16
+        let searchBarBottom = searchController.searchBar.frame.maxY
+        
+        categoryCollectionView.frame = CGRect(
+            x: 0,
+            y: searchBarBottom + padding,
+            width: view.frame.width,
+            height: 30
+        )
+        discoverCollectionView.frame = CGRect(
+            x: 0,
+            y: categoryCollectionView.frame.maxY + padding,
+            width: view.frame.width,
+            height: view.frame.height - categoryCollectionView.frame.maxY - padding
+        )
     }
     
     
@@ -93,11 +130,10 @@ class SearchVC: UIViewController {
         ]
         let searchBarConstraints = [
             searchController.searchBar.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
-            searchController.searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchController.searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            searchController.searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            searchController.searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
         ]
-        
-        
+
         NSLayoutConstraint.activate(discoverHeaderLabelConstraints)
         NSLayoutConstraint.activate(descriptionLabelConstraints)
         NSLayoutConstraint.activate(searchBarConstraints)
@@ -105,12 +141,13 @@ class SearchVC: UIViewController {
     
 
 }
-
-// MARK: - Category Collection View
+// MARK: - Category and Discover Collection View
 extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == categoryCollectionView {
-            return 10
+            return categories.count
+        } else if collectionView == discoverCollectionView {
+            return searchResults.count
         }
         return 0
     }
@@ -120,23 +157,73 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
                 return UICollectionViewCell()
             }
+            cell.configure(with: categories[indexPath.item], isSelected: indexPath.item == selectedCategoryIndex)
+            return cell
+        } else if collectionView == discoverCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiscoverCollectionViewCell.identifier, for: indexPath) as? DiscoverCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            let result = searchResults[indexPath.item]
+            cell.configure(with: result)
+            return cell
+        }
+        return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == categoryCollectionView {
+            selectedCategoryIndex = indexPath.item
             
+            let selectedCategory = categories[selectedCategoryIndex]
+            APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let news):
+                        self?.searchNews = news
+                        self?.discoverCollectionView.reloadData()
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+            categoryCollectionView.reloadData()
+        } else if collectionView == discoverCollectionView {
+            // islemler
+        }
+    }
+}
+
+extension SearchVC: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text, !query.isEmpty else {
+            let selectedCategory = categories[selectedCategoryIndex]
+            APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let news):
+                        self?.searchNews = news
+                        self?.discoverCollectionView.reloadData()
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+            return
+        }
+        
+        APICaller.shared.search(with: query) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let results):
+                    self?.searchResults = results
+                    self?.discoverCollectionView.reloadData()
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
         }
         
     }
     
     
 }
-//
-//// MARK: - Discover Collection View
-//extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        <#code#>
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        <#code#>
-//    }
-//    
-//    
-//}

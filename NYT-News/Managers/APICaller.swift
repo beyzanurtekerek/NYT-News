@@ -62,5 +62,37 @@ class APICaller {
         }
         task.resume()
     }
+
+    func fetchNews(for category: String, completion: @escaping (Result<[New], Error>) -> Void) {
+        let categoryLowercased = category.lowercased()
+        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/\(categoryLowercased).json?api-key=\(Constants.API_KEY)") else { return }
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else {
+                completion(.failure(APIError.failedToGetData))
+                return
+            }
+            do {
+                let results = try JSONDecoder().decode(NewResponse.self, from: data)
+                completion(.success(results.results))
+            } catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        task.resume()
+    }
+    
+//    func fetchNews(for category: String) {
+//        APICaller.shared.fetchNews(for: category) { [weak self] result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let news):
+//                    self?.searchNews = news
+//                    self?.discoverCollectionView.reloadData()
+//                case .failure(let error):
+//                    print(error.localizedDescription)
+//                }
+//            }
+//        }
+//    }
     
 }

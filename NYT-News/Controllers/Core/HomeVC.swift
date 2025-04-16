@@ -84,8 +84,19 @@ class HomeVC: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let padding: CGFloat = 16
-        breakingNewsCollectionView.frame = CGRect(x: 0, y: breakingNewsHeader.frame.maxY + padding , width: view.frame.width, height: 250)
-        recommendationTableView.frame = CGRect(x: 0, y: recommendationHeader.frame.maxY + padding, width: view.frame.width, height: view.frame.height)
+        
+        breakingNewsCollectionView.frame = CGRect(
+            x: 0,
+            y: breakingNewsHeader.frame.maxY + padding,
+            width: view.frame.width,
+            height: 250
+        )
+        recommendationTableView.frame = CGRect(
+            x: 0,
+            y: recommendationHeader.frame.maxY + padding,
+            width: view.frame.width,
+            height: view.frame.height
+        )
     }
     
     private func applyConstraints() {
