@@ -25,7 +25,22 @@ class MainTabBarVC: UITabBarController {
         vc2.title = "Search"
         vc3.title = "Saved"
         
-        tabBar.tintColor = .label
+        tabBar.isTranslucent = true
+        let blurEffect = UIBlurEffect(style: .light)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        tabBar.insertSubview(blurView, at: 0)
+        
+        NSLayoutConstraint.activate([
+            blurView.leadingAnchor.constraint(equalTo: tabBar.leadingAnchor),
+            blurView.trailingAnchor.constraint(equalTo: tabBar.trailingAnchor),
+            blurView.topAnchor.constraint(equalTo: tabBar.topAnchor),
+            blurView.bottomAnchor.constraint(equalTo: tabBar.bottomAnchor)
+        ])
+        
+        tabBar.backgroundImage = UIImage()
+        tabBar.shadowImage = UIImage()
+
         
         setViewControllers([vc1, vc2, vc3], animated: true)
         

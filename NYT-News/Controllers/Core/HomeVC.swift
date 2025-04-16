@@ -34,6 +34,7 @@ class HomeVC: UIViewController {
     private let recommendationTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
         table.register(RecommendationTableViewCell.self, forCellReuseIdentifier: RecommendationTableViewCell.identifier)
+        table.separatorStyle = .none
         return table
     }()
     
@@ -75,10 +76,10 @@ class HomeVC: UIViewController {
         fetchBreakingNews()
         applyConstraints()
         
-        if let tabBar = self.tabBarController?.tabBar {
-            tabBar.backgroundImage = UIImage()
-            tabBar.backgroundColor = UIColor.systemBackground.withAlphaComponent(1)
-        }
+//        if let tabBar = self.tabBarController?.tabBar {
+//            tabBar.backgroundImage = UIImage()
+//            tabBar.backgroundColor = UIColor.systemBackground.withAlphaComponent(1)
+//        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -93,7 +94,7 @@ class HomeVC: UIViewController {
         )
         recommendationTableView.frame = CGRect(
             x: 0,
-            y: recommendationHeader.frame.maxY + padding,
+            y: recommendationHeader.frame.maxY,
             width: view.frame.width,
             height: view.frame.height
         )
@@ -110,7 +111,7 @@ class HomeVC: UIViewController {
             recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 50),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            recommendationHeader.heightAnchor.constraint(equalToConstant: 15)
+            recommendationHeader.heightAnchor.constraint(equalToConstant: 25)
         ]
         
         NSLayoutConstraint.activate(recommendationHeaderConstraints)
