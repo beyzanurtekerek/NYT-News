@@ -12,6 +12,17 @@ class RecommendationTableViewCell: UITableViewCell {
 
     static let identifier = "RecommendationTableViewCell"
     
+    private let containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 8
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
     private let populerImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -49,10 +60,11 @@ class RecommendationTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(populerImageView)
-        contentView.addSubview(bylineLabel)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(dateLabel)
+        contentView.addSubview(containerView)
+        containerView.addSubview(populerImageView)
+        containerView.addSubview(bylineLabel)
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(dateLabel)
         
         applyConstraints()
     }
@@ -62,9 +74,15 @@ class RecommendationTableViewCell: UITableViewCell {
     }
     
     private func applyConstraints() {
+        let containerConstraints = [
+            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+        ]
         let populerImageViewConstraints = [
-            populerImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            populerImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            populerImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
+            populerImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             populerImageView.widthAnchor.constraint(equalToConstant: 100),
             populerImageView.heightAnchor.constraint(equalToConstant: 100)
         ]
@@ -74,17 +92,18 @@ class RecommendationTableViewCell: UITableViewCell {
             bylineLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor)
         ]
         let titleLabelConstraints = [
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: populerImageView.trailingAnchor, constant: 10),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16)
         ]
         let dateLabelConstraints = [
             dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
+            dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: containerView.bottomAnchor, constant: -10)
         ]
         
+        NSLayoutConstraint.activate(containerConstraints)
         NSLayoutConstraint.activate(populerImageViewConstraints)
         NSLayoutConstraint.activate(titleLabelConstraints)
         NSLayoutConstraint.activate(bylineLabelConstraints)
