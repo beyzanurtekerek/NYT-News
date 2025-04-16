@@ -25,7 +25,9 @@ class MainTabBarVC: UITabBarController {
         vc2.title = "Search"
         vc3.title = "Saved"
         
+        tabBar.tintColor = .label
         tabBar.isTranslucent = true
+        
         let blurEffect = UIBlurEffect(style: .light)
         let blurView = UIVisualEffectView(effect: blurEffect)
         blurView.translatesAutoresizingMaskIntoConstraints = false
