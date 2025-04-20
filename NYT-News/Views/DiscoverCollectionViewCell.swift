@@ -81,7 +81,19 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         return button
     }()
 
-    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        searchImageView.image = nil
+        headlineLabel.text = nil
+        abstractlabel.text = nil
+        dateLabel.text = nil
+        sectionLabel.text = nil
+        bylineLabel.text = nil
+        
+        docs = nil
+        news = nil
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
