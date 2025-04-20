@@ -21,14 +21,15 @@ class SearchVC: UIViewController {
         "Arts",
         "Politics",
         "Travel",
-        "Style"
+        "Style",
+        "Magazine",
+        "Fashion",
+        "Arts"
     ]
     private var selectedCategoryIndex = 0
-
     
     private let categoryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 100, height: 30)
         layout.minimumInteritemSpacing = 20
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         layout.scrollDirection = .horizontal
@@ -40,7 +41,6 @@ class SearchVC: UIViewController {
 
     private let discoverCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 300, height: 350)
         layout.minimumInteritemSpacing = 20
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -65,16 +65,13 @@ class SearchVC: UIViewController {
         return label
     }()
     
-    private let searchController: UISearchController = {
-        let controller = UISearchController(searchResultsController: nil)
-        controller.searchBar.placeholder = "Search for news..."
-        controller.searchBar.searchBarStyle = .minimal
-        controller.searchBar.translatesAutoresizingMaskIntoConstraints = false
-        controller.hidesNavigationBarDuringPresentation = false
-        controller.obscuresBackgroundDuringPresentation = false
-        return controller
-    }()    
-    
+    private let searchBar: UISearchBar = {
+        let bar = UISearchBar()
+        bar.placeholder = "Search for news..."
+        bar.searchBarStyle = .minimal
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        return bar
+    }()
     
     
     override func viewDidLoad() {
@@ -85,13 +82,13 @@ class SearchVC: UIViewController {
         view.addSubview(discoverCollectionView)
         view.addSubview(discoverHeaderLabel)
         view.addSubview(descriptionLabel)
-        view.addSubview(searchController.searchBar)
+        view.addSubview(searchBar)
         
         categoryCollectionView.delegate = self
         categoryCollectionView.dataSource = self
         discoverCollectionView.delegate = self
         discoverCollectionView.dataSource = self
-        searchController.searchResultsUpdater = self
+        searchBar.delegate = self
         
         configureNavbar()
         applyConstraints()
@@ -101,7 +98,7 @@ class SearchVC: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let padding: CGFloat = 16
-        let searchBarBottom = searchController.searchBar.frame.maxY
+        let searchBarBottom = searchBar.frame.maxY
         
         categoryCollectionView.frame = CGRect(
             x: 0,
@@ -129,9 +126,9 @@ class SearchVC: UIViewController {
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ]
         let searchBarConstraints = [
-            searchController.searchBar.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
-            searchController.searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
-            searchController.searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
+            searchBar.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
         ]
 
         NSLayoutConstraint.activate(discoverHeaderLabelConstraints)
@@ -142,12 +139,14 @@ class SearchVC: UIViewController {
 
 }
 // MARK: - Category and Discover Collection View
-extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
+extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == categoryCollectionView {
+            print("Search News Count: \(searchNews.count)")
             return categories.count
         } else if collectionView == discoverCollectionView {
-            return searchResults.count
+            print("Search Results Count: \(searchResults.count)")
+            return searchBar.text?.isEmpty == false ? searchResults.count : searchNews.count
         }
         return 0
     }
@@ -163,8 +162,13 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiscoverCollectionViewCell.identifier, for: indexPath) as? DiscoverCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            let result = searchResults[indexPath.item]
-            cell.configure(with: result)
+            if searchBar.text?.isEmpty == false {
+                let result = searchResults[indexPath.item]
+                cell.configure(with: result)
+            } else {
+                let news = searchNews[indexPath.item]
+                cell.configure(with: news)
+            }
             return cell
         }
         return UICollectionViewCell()
@@ -191,11 +195,21 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource {
             // islemler
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == categoryCollectionView {
+            return CGSize(width: 100, height: 30)
+        } else if collectionView == discoverCollectionView {
+            let width = collectionView.bounds.width - 32
+            return CGSize(width: width, height: 450)
+        }
+        return .zero
+    }
 }
 
-extension SearchVC: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let query = searchController.searchBar.text, !query.isEmpty else {
+extension SearchVC: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard !searchText.isEmpty else {
             let selectedCategory = categories[selectedCategoryIndex]
             APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
                 DispatchQueue.main.async {
@@ -210,8 +224,8 @@ extension SearchVC: UISearchResultsUpdating {
             }
             return
         }
-        
-        APICaller.shared.search(with: query) { [weak self] result in
+
+        APICaller.shared.search(with: searchText) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let results):
@@ -222,8 +236,5 @@ extension SearchVC: UISearchResultsUpdating {
                 }
             }
         }
-        
     }
-    
-    
 }

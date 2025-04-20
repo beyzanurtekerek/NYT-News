@@ -25,6 +25,20 @@ extension UIViewController {
         navigationItem.rightBarButtonItem = menuButton
         
         navigationController?.navigationBar.tintColor = .label
+        
+        // Border ekleme kısmı
+        let border = UIView()
+        border.backgroundColor = .lightGray  // Çizginin rengini ayarlayabilirsiniz
+        border.translatesAutoresizingMaskIntoConstraints = false
+        navigationController?.navigationBar.addSubview(border)
+        
+        NSLayoutConstraint.activate([
+            border.heightAnchor.constraint(equalToConstant: 0.4),  // Çizgi kalınlığı
+            border.bottomAnchor.constraint(equalTo: navigationController!.navigationBar.bottomAnchor),
+            border.leadingAnchor.constraint(equalTo: navigationController!.navigationBar.leadingAnchor),
+            border.trailingAnchor.constraint(equalTo: navigationController!.navigationBar.trailingAnchor)
+        ])
+
     }
     
     @objc func menuButtonClicked() {

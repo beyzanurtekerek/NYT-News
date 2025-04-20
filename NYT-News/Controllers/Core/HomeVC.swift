@@ -28,6 +28,7 @@ class HomeVC: UIViewController {
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(BreakingNewsCollectionViewCell.self, forCellWithReuseIdentifier: BreakingNewsCollectionViewCell.identifier)
+        collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
     
@@ -54,6 +55,15 @@ class HomeVC: UIViewController {
         return label
     }()
     
+    private let pageControl: UIPageControl = {
+        let pageControl = UIPageControl()
+        pageControl.currentPageIndicatorTintColor = .label
+        pageControl.pageIndicatorTintColor = .gray
+        pageControl.currentPage = 0
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        return pageControl
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -62,6 +72,7 @@ class HomeVC: UIViewController {
         view.addSubview(breakingNewsCollectionView)
         view.addSubview(recommendationHeader)
         view.addSubview(recommendationTableView)
+        view.addSubview(pageControl)
         
         breakingNewsCollectionView.backgroundColor = .clear
         recommendationTableView.backgroundColor = .clear
@@ -75,11 +86,6 @@ class HomeVC: UIViewController {
         fetchRecommendations()
         fetchBreakingNews()
         applyConstraints()
-        
-//        if let tabBar = self.tabBarController?.tabBar {
-//            tabBar.backgroundImage = UIImage()
-//            tabBar.backgroundColor = UIColor.systemBackground.withAlphaComponent(1)
-//        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -91,6 +97,12 @@ class HomeVC: UIViewController {
             y: breakingNewsHeader.frame.maxY + padding,
             width: view.frame.width,
             height: 250
+        )
+        pageControl.frame = CGRect(
+            x: (view.frame.width - 200) / 2,
+            y: breakingNewsCollectionView.frame.maxY + padding,
+            width: 200,
+            height: 20
         )
         recommendationTableView.frame = CGRect(
             x: 0,
@@ -108,11 +120,10 @@ class HomeVC: UIViewController {
             breakingNewsHeader.heightAnchor.constraint(equalToConstant: 30)
         ]
         let recommendationHeaderConstraints = [
-            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 50),
+            recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 60),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            recommendationHeader.heightAnchor.constraint(equalToConstant: 25)
-        ]
+            recommendationHeader.heightAnchor.constraint(equalToConstant: 25)        ]
         
         NSLayoutConstraint.activate(recommendationHeaderConstraints)
         NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
@@ -125,13 +136,14 @@ class HomeVC: UIViewController {
                 self?.breakingNews = newsData
                 DispatchQueue.main.async {
                     self?.breakingNewsCollectionView.reloadData()
+                    self?.pageControl.numberOfPages = newsData.count
                 }
             case .failure(let error):
                 print("fetch Breaking News Error: \(error.localizedDescription)")
             }
         }
     }
-    
+        
     func fetchRecommendations() {
         APICaller.shared.getTopStoriesTech { [weak self] result in
             switch result {
@@ -199,7 +211,13 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        navigationController?.navigationBar.alpha = 1
+        if scrollView == breakingNewsCollectionView {
+            let pageWidth = breakingNewsCollectionView.frame.width
+            let currentPage = Int(breakingNewsCollectionView.contentOffset.x / pageWidth)
+            pageControl.currentPage = currentPage
+        } else if scrollView == recommendationTableView {
+            navigationController?.navigationBar.alpha = 1
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

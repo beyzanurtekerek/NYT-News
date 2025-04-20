@@ -22,6 +22,7 @@ struct Doc: Codable {
     let pub_date: String?
     let headline: Headline
     let section_name: String?
+    let web_url: String?
 }
 
 struct Byline: Codable {
