@@ -80,19 +80,4 @@ class APICaller {
         }
         task.resume()
     }
-    
-//    func fetchNews(for category: String) {
-//        APICaller.shared.fetchNews(for: category) { [weak self] result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let news):
-//                    self?.searchNews = news
-//                    self?.discoverCollectionView.reloadData()
-//                case .failure(let error):
-//                    print(error.localizedDescription)
-//                }
-//            }
-//        }
-//    }
-    
 }

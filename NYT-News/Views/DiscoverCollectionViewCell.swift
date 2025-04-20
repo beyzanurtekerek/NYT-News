@@ -81,6 +81,8 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         return button
     }()
 
+    
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         

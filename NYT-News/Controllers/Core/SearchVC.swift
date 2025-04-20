@@ -92,7 +92,7 @@ class SearchVC: UIViewController {
         
         configureNavbar()
         applyConstraints()
-        
+        fetchInitialCategoryNews()
     }
     
     override func viewDidLayoutSubviews() {
@@ -136,6 +136,20 @@ class SearchVC: UIViewController {
         NSLayoutConstraint.activate(searchBarConstraints)
     }
     
+    private func fetchInitialCategoryNews() {
+        let selectedCategory = categories[selectedCategoryIndex]
+        APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let news):
+                    self?.searchNews = news
+                    self?.discoverCollectionView.reloadData()
+                case .failure(let error):
+                    print("Initial fetch error: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
 
 }
 // MARK: - Category and Discover Collection View
