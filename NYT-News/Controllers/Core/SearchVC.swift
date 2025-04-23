@@ -119,7 +119,7 @@ class SearchVC: UIViewController {
         let discoverHeaderLabelConstraints = [
             discoverHeaderLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             discoverHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            discoverHeaderLabel.heightAnchor.constraint(equalToConstant: 50)
+            discoverHeaderLabel.heightAnchor.constraint(equalToConstant: 40)
         ]
         let descriptionLabelConstraints = [
             descriptionLabel.topAnchor.constraint(equalTo: discoverHeaderLabel.bottomAnchor, constant: 10),

@@ -13,7 +13,6 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
     var news: New?
     var docs: Doc?
 
-    // NESNELER EKLENECEK - DÜZENLENECEK!!!
     
     private let searchImageView: UIImageView = {
         let imageView = UIImageView()
@@ -80,6 +79,16 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    private let saveButton: UIButton = {
+        let button = UIButton()
+        let config = UIImage.SymbolConfiguration(pointSize: 20)
+        let image = UIImage(systemName: "bookmark", withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.tintColor = .systemCyan
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
 
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -105,9 +114,11 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(headlineLabel)
         contentView.addSubview(bylineLabel)
         contentView.addSubview(readMoreButton)
+        contentView.addSubview(saveButton)
         
         applyConstraints()
         readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
+        saveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
         
         contentView.layer.cornerRadius = 12
         contentView.layer.borderWidth = 1
@@ -125,6 +136,19 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
             UIApplication.shared.open(url)
         } else if let urlString = news?.url, let url = URL(string: urlString) {
             UIApplication.shared.open(url)
+        }
+    }
+    
+    @objc private func didTapSave() {
+        let config = UIImage.SymbolConfiguration(pointSize: 20)
+        if saveButton.currentImage == UIImage(systemName: "bookmark", withConfiguration: config) {
+            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: config)
+            saveButton.setImage(filledImage, for: .normal)
+            // buraya kaydetme işlemi eklenecekse yapılabilir
+        } else {
+            let image = UIImage(systemName: "bookmark", withConfiguration: config)
+            saveButton.setImage(image, for: .normal)
+            // buraya silme işlemi eklenecekse yapılabilir
         }
     }
     
@@ -165,7 +189,12 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
             readMoreButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             readMoreButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ]
-            
+        let saveButtonConstraints = [
+            saveButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            saveButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            saveButton.widthAnchor.constraint(equalToConstant: 30),
+            saveButton.heightAnchor.constraint(equalToConstant: 30)
+        ]
         NSLayoutConstraint.activate(searchImageViewConstraints)
         NSLayoutConstraint.activate(headlineLabelConstraints)
         NSLayoutConstraint.activate(abstractlabelConstraints)
@@ -173,6 +202,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate(sectionLabelConstraints)
         NSLayoutConstraint.activate(bylineLabelConstraints)
         NSLayoutConstraint.activate(readMoreButtonConstraints)
+        NSLayoutConstraint.activate(saveButtonConstraints)
     }
     
     public func configure(with model: Doc) {
