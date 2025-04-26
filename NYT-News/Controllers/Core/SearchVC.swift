@@ -192,6 +192,8 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
         if collectionView == categoryCollectionView {
             selectedCategoryIndex = indexPath.item
             
+            searchBar.text = ""
+            
             let selectedCategory = categories[selectedCategoryIndex]
             APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
                 DispatchQueue.main.async {

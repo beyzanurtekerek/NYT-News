@@ -42,7 +42,7 @@ class HomeVC: UIViewController {
     private let breakingNewsHeader: UILabel = {
         let label = UILabel()
         label.text = "Breaking News"
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.boldSystemFont(ofSize: 26)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -50,7 +50,7 @@ class HomeVC: UIViewController {
     private let recommendationHeader: UILabel = {
         let label = UILabel()
         label.text = "Recommendation"
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.boldSystemFont(ofSize: 26)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
