@@ -51,7 +51,7 @@ class SearchVC: UIViewController {
     private let discoverHeaderLabel: UILabel = {
         let label = UILabel()
         label.text = "Discover"
-        label.font = UIFont.boldSystemFont(ofSize: 40)
+        label.font = UIFont.boldSystemFont(ofSize: 36)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
