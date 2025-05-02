@@ -9,6 +9,7 @@ import UIKit
 
 class SearchVC: UIViewController {
     
+    private var searchWorkItem: DispatchWorkItem?
     private var searchNews: [New] = [New]()
     private var searchResults: [Doc] = [Doc]()
     private let categories = [
@@ -23,8 +24,7 @@ class SearchVC: UIViewController {
         "Travel",
         "Style",
         "Magazine",
-        "Fashion",
-        "Arts"
+        "Fashion"
     ]
     private var selectedCategoryIndex = 0
     
@@ -199,7 +199,8 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let news):
-                        self?.searchNews = news
+                        let filteredNews = news.filter { $0.section?.lowercased() == selectedCategory.lowercased()}
+                        self?.searchNews = filteredNews
                         self?.discoverCollectionView.reloadData()
                     case .failure(let error):
                         print(error.localizedDescription)
@@ -208,7 +209,7 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
             }
             categoryCollectionView.reloadData()
         } else if collectionView == discoverCollectionView {
-            // islemler
+            // search vc de haber cell tıklanırsa yapılacaklar burada
         }
     }
     
@@ -225,32 +226,39 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
 
 extension SearchVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        guard !searchText.isEmpty else {
-            let selectedCategory = categories[selectedCategoryIndex]
-            APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+        searchWorkItem?.cancel()
+        
+        let workItem = DispatchWorkItem { [weak self] in
+            guard !searchText.isEmpty else {
+                let selectedCategory = self?.categories[self?.selectedCategoryIndex ?? 0] ?? ""
+                APICaller.shared.fetchNews(for: selectedCategory) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let news):
+                            self?.searchNews = news
+                            self?.discoverCollectionView.reloadData()
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
+                return
+            }
+            
+            APICaller.shared.search(with: searchText) { result in
                 DispatchQueue.main.async {
                     switch result {
-                    case .success(let news):
-                        self?.searchNews = news
+                    case .success(let results):
+                        self?.searchResults = results
                         self?.discoverCollectionView.reloadData()
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
                 }
             }
-            return
         }
-
-        APICaller.shared.search(with: searchText) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let results):
-                    self?.searchResults = results
-                    self?.discoverCollectionView.reloadData()
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        }
+        
+        searchWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
     }
 }
