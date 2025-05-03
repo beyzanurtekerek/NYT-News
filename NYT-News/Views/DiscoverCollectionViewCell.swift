@@ -151,11 +151,13 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
             if DataPersistenceManager.shared.isAlreadySaved(news) {
                 DataPersistenceManager.shared.delete(news)
                 self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+                self.contentView.showToast(message: "UNSAVED 😢")
             } else {
                 DataPersistenceManager.shared.saveArticle(from: news) { result in
                     switch result {
                     case .success:
                         self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+                        self.contentView.showToast(message: "SAVED 🥳")
                     case .failure(let error):
                         print("Error saving news: \(error.localizedDescription)")
                     }
@@ -167,11 +169,13 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
             if DataPersistenceManager.shared.isAlreadySaved(docs) {
                 DataPersistenceManager.shared.delete(docs)
                 self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+                self.contentView.showToast(message: "UNSAVED 😢")
             } else {
                 DataPersistenceManager.shared.saveArticle(from: docs) { result in
                     switch result {
                     case .success:
                         self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+                        self.contentView.showToast(message: "SAVED 🥳")
                     case .failure(let error):
                         print("Error saving doc: \(error.localizedDescription)")
                     }
