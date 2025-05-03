@@ -27,7 +27,7 @@ extension UIView {
             
             NSLayoutConstraint.activate([
                 toastLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-                toastLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -100),
+                toastLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 70),
                 toastLabel.widthAnchor.constraint(lessThanOrEqualTo: self.widthAnchor, constant: -60)
             ])
             
