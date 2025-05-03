@@ -240,6 +240,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         abstractlabel.text = model.abstract
         dateLabel.text = DateFormatterUtil.formattedDate(from: model.pub_date ?? "")
         sectionLabel.text = model.section_name?.uppercased()
+        bylineLabel.text = "• \(model.byline.original ?? "Unknown Author")"
         
         if let imageUrlString = model.multimedia.multimediaDefault?.url,
            let imageUrl = URL(string: imageUrlString) {
