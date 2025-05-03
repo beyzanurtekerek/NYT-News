@@ -232,6 +232,7 @@ extension SavedVC: DiscoverCollectionViewCellDelegate {
             savedArticles.remove(at: indexPath.item)
             DispatchQueue.main.async {
                 self.collectionView.deleteItems(at: [indexPath])
+                self.view.showToast(message: "Unsaved successfully")
             }
         case .failure(let error):
             print("Error deleting: \(error.localizedDescription)")
@@ -242,9 +243,16 @@ extension SavedVC: DiscoverCollectionViewCellDelegate {
         switch result {
         case .success():
             print("Saved successfully.")
+            DispatchQueue.main.async {
+                self.view.showToast(message: "Saved successfully")
+            }
             fetchSavedArticles()
         case .failure(let error):
             print("Error saving: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.view.showToast(message: "Failed to save article.")
+            }
+
         }
     }
 }
