@@ -19,56 +19,6 @@ class DataPersistenceManager {
     
     static let shared = DataPersistenceManager()
     
-//    func saveNewWith(model: New, completion: @escaping (Result<Void, Error>) -> Void) {
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-//        
-//        let context = appDelegate.persistentContainer.viewContext
-//        let item = NewsItem(context: context)
-//        
-//        item.title = model.title
-//        item.abstract = model.abstract
-//        item.url = model.url
-//        item.byline = model.byline
-//        item.published_date = model.published_date
-//        item.section = model.section
-//        item.imageUrl = model.multimedia?.first?.url ?? ""
-//        
-//        do {
-//            try context.save()
-//            completion(.success(()))
-//        } catch {
-//            completion(.failure(DatabaseError.failedToSaveData))
-//        }
-//    }
-//    
-//    func fetchFromDataBase(completion: @escaping (Result<[NewsItem], Error>) -> Void) {
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-//        
-//        let context = appDelegate.persistentContainer.viewContext
-//        let request: NSFetchRequest<NewsItem> = NewsItem.fetchRequest()
-//        
-//        do {
-//            let newsItems = try context.fetch(request)
-//            completion(.success(newsItems))
-//        } catch {
-//            completion(.failure(DatabaseError.failedToFetchData))
-//        }
-//    }
-//    
-//    func deleteNewWith(model: NewsItem, completion: @escaping (Result<Void, Error>) -> Void) {
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-//        
-//        let context = appDelegate.persistentContainer.viewContext
-//        context.delete(model)
-//        
-//        do {
-//            try context.save()
-//            completion(.success(()))
-//        } catch {
-//            completion(.failure(DatabaseError.failedToDeleteData))
-//        }
-//    }
-    
     func saveArticle(from new: New, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
@@ -88,7 +38,7 @@ class DataPersistenceManager {
             completion(.failure(DatabaseError.failedToSaveData))
         }
     }
-
+    
     func saveArticle(from doc: Doc, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
@@ -121,18 +71,76 @@ class DataPersistenceManager {
             completion(.failure(DatabaseError.failedToFetchData))
         }
     }
-
-    func deleteArticle(_ article: SavedArticle, completion: @escaping (Result<Void, Error>) -> Void) {
+    
+    func deleteArticle(from article: New, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
-        context.delete(article)
+        let fetchRequest: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "title == %@", article.title ?? "")
         
         do {
+            let results = try context.fetch(fetchRequest)
+            for object in results {
+                context.delete(object)
+            }
             try context.save()
             completion(.success(()))
         } catch {
-            completion(.failure(DatabaseError.failedToDeleteData))
+            completion(.failure(error))
         }
     }
     
+    func deleteArticle(from article: Doc, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let context = appDelegate.persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "title == %@", article.headline.main ?? "")
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            for object in results {
+                context.delete(object)
+            }
+            try context.save()
+            completion(.success(()))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func isAlreadySaved(_ news: New) -> Bool {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return false }
+        let context = appDelegate.persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", news.title ?? "")
+        do {
+            let count = try context.count(for: fetchRequest)
+            return count > 0
+        } catch {
+            return false
+        }
+    }
+
+    func isAlreadySaved(_ doc: Doc) -> Bool {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return false }
+        let context = appDelegate.persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", doc.headline.main ?? "")
+        do {
+            let count = try context.count(for: fetchRequest)
+            return count > 0
+        } catch {
+            return false
+        }
+    }
+
+    func delete(_ news: New) {
+        deleteArticle(from: news) { _ in }
+    }
+
+    func delete(_ doc: Doc) {
+        deleteArticle(from: doc) { _ in }
+    }
 }

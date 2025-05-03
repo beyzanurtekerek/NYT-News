@@ -179,9 +179,11 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
             if searchBar.text?.isEmpty == false {
                 let result = searchResults[indexPath.item]
                 cell.configure(with: result)
+                cell.delegate = self
             } else {
                 let news = searchNews[indexPath.item]
                 cell.configure(with: news)
+                cell.delegate = self
             }
             return cell
         }
@@ -260,5 +262,14 @@ extension SearchVC: UISearchBarDelegate {
         
         searchWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
+    }
+}
+
+// MARK: - DiscoverCollectionViewCellDelegate
+extension SearchVC: DiscoverCollectionViewCellDelegate {
+    func didTapSaveButton(on cell: DiscoverCollectionViewCell) {
+        if let indexPath = discoverCollectionView.indexPath(for: cell) {
+            discoverCollectionView.reloadItems(at: [indexPath])
+        }
     }
 }

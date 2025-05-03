@@ -1,5 +1,5 @@
 //
-//  SearchCollectionViewCell.swift
+//  DiscoverCollectionViewCell.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 14.04.2025.
@@ -7,8 +7,13 @@
 
 import UIKit
 
+protocol DiscoverCollectionViewCellDelegate: AnyObject {
+    func didTapSaveButton(on cell: DiscoverCollectionViewCell)
+}
+
 class DiscoverCollectionViewCell: UICollectionViewCell {
 
+    weak var delegate: DiscoverCollectionViewCellDelegate?
     static let identifier = "DiscoverCollectionViewCell"
     var news: New?
     var docs: Doc?
@@ -141,14 +146,38 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
     
     @objc private func didTapSave() {
         let config = UIImage.SymbolConfiguration(pointSize: 20)
-        if saveButton.currentImage == UIImage(systemName: "bookmark", withConfiguration: config) {
-            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: config)
-            saveButton.setImage(filledImage, for: .normal)
-            // buraya kaydetme işlemi eklenecekse yapılabilir
-        } else {
-            let image = UIImage(systemName: "bookmark", withConfiguration: config)
-            saveButton.setImage(image, for: .normal)
-            // buraya silme işlemi eklenecekse yapılabilir
+
+        if let news = news {
+            if DataPersistenceManager.shared.isAlreadySaved(news) {
+                DataPersistenceManager.shared.delete(news)
+                self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+            } else {
+                DataPersistenceManager.shared.saveArticle(from: news) { result in
+                    switch result {
+                    case .success:
+                        self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+                    case .failure(let error):
+                        print("Error saving news: \(error.localizedDescription)")
+                    }
+                }
+            }
+            NotificationCenter.default.post(name: .didChangeSavedStatus, object: nil)
+
+        } else if let docs = docs {
+            if DataPersistenceManager.shared.isAlreadySaved(docs) {
+                DataPersistenceManager.shared.delete(docs)
+                self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+            } else {
+                DataPersistenceManager.shared.saveArticle(from: docs) { result in
+                    switch result {
+                    case .success:
+                        self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+                    case .failure(let error):
+                        print("Error saving doc: \(error.localizedDescription)")
+                    }
+                }
+            }
+            NotificationCenter.default.post(name: .didChangeSavedStatus, object: nil)
         }
     }
     
@@ -205,7 +234,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate(saveButtonConstraints)
     }
     
-    public func configure(with model: Doc) {
+    public func configure(with model: Doc, isSaved: Bool = false) {
         self.docs = model
         headlineLabel.text = model.headline.main
         abstractlabel.text = model.abstract
@@ -225,9 +254,18 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         } else {
             searchImageView.image = UIImage(named: "placeholder")
         }
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 20)
+        if let news = self.news, DataPersistenceManager.shared.isAlreadySaved(news) {
+            self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+        } else if let doc = self.docs, DataPersistenceManager.shared.isAlreadySaved(doc) {
+            self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+        } else {
+            self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+        }
     }
     
-    public func configure(with model: New) {
+    public func configure(with model: New, isSaved: Bool = false) {
         self.news = model
         headlineLabel.text = model.title
         abstractlabel.text = model.abstract
@@ -247,9 +285,15 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         } else {
             searchImageView.image = UIImage(named: "placeholder")
         }
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 20)
+        if let news = self.news, DataPersistenceManager.shared.isAlreadySaved(news) {
+            self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+        } else if let doc = self.docs, DataPersistenceManager.shared.isAlreadySaved(doc) {
+            self.saveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+        } else {
+            self.saveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+        }
     }
     
 }
-
-
-

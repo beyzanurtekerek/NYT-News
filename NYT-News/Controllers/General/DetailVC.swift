@@ -164,16 +164,35 @@ class DetailVC: UIViewController {
     }
     
     @objc private func didTapSave() {
-        // islemler
-        print("save tıklandı")
+        
+        guard let article = news else { return }
         let config = UIImage.SymbolConfiguration(pointSize: 25)
-        if navSaveButton.currentImage == UIImage(systemName: "bookmark", withConfiguration: config) {
-            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: config)
-            navSaveButton.setImage(filledImage, for: .normal)
-        } else {
+        let isSaved = DataPersistenceManager.shared.isAlreadySaved(article)
+        
+        if isSaved {
+            DataPersistenceManager.shared.deleteArticle(from: article) { result in
+                switch result {
+                case .success():
+                    print("Successfully deleted.")
+                case .failure(let error):
+                    print("Delete failed: \(error.localizedDescription)")
+                }
+            }
             let image = UIImage(systemName: "bookmark", withConfiguration: config)
             navSaveButton.setImage(image, for: .normal)
+        } else {
+            DataPersistenceManager.shared.saveArticle(from: article) { result in
+                switch result {
+                case .success():
+                    print("Successfully saved.")
+                case .failure(let error):
+                    print("Save failed: \(error.localizedDescription)")
+                }
+            }
+            let filledImage = UIImage(systemName: "bookmark.fill", withConfiguration: config)
+            navSaveButton.setImage(filledImage, for: .normal)
         }
+        NotificationCenter.default.post(name: .didChangeSavedStatus, object: nil)
     }
     
     private func setupNavBar() {
@@ -284,6 +303,13 @@ class DetailVC: UIViewController {
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
         bylineLabel.text = "• \(model.byline ?? "Unknown Author")"
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 25)
+        if let news = self.news, DataPersistenceManager.shared.isAlreadySaved(news) {
+            navSaveButton.setImage(UIImage(systemName: "bookmark.fill", withConfiguration: config), for: .normal)
+        } else {
+            navSaveButton.setImage(UIImage(systemName: "bookmark", withConfiguration: config), for: .normal)
+        }
     }
     
     
