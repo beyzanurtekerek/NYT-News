@@ -174,7 +174,7 @@ class DetailVC: UIViewController {
                 switch result {
                 case .success():
                     print("Successfully deleted.")
-                    self.view.showToast(message: "UNSAVED 😢")
+                    self.view.showToast(message: "UNSAVED 🙁")
                 case .failure(let error):
                     print("Delete failed: \(error.localizedDescription)")
                 }
@@ -186,7 +186,7 @@ class DetailVC: UIViewController {
                 switch result {
                 case .success():
                     print("Successfully saved.")
-                    self.view.showToast(message: "SAVED 🥳")
+                    self.view.showToast(message: "SAVED 🙂")
                 case .failure(let error):
                     print("Save failed: \(error.localizedDescription)")
                 }
