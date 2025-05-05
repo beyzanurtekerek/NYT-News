@@ -60,17 +60,21 @@ class RecommendationTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(containerView)
-        containerView.addSubview(populerImageView)
-        containerView.addSubview(bylineLabel)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(dateLabel)
         
+        setupUI()
         applyConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError()
+    }
+    
+    private func setupUI() {
+        contentView.addSubview(containerView)
+        containerView.addSubview(populerImageView)
+        containerView.addSubview(bylineLabel)
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(dateLabel)
     }
     
     private func applyConstraints() {
@@ -110,7 +114,7 @@ class RecommendationTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate(dateLabelConstraints)
     }
     
-    public func configure(with model: New) {
+    public func configureWithNews(with model: New) {
         guard let urlString = model.multimedia?.first?.url,
               let url = URL(string: urlString) else { return }
         

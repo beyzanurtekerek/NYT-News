@@ -295,7 +295,7 @@ class HomeDetailViewController: UIViewController {
     }
     
     
-    public func configure(with model: New) {
+    public func configureWithNews(with model: New) {
         self.news = model
         guard let urlString = model.multimedia?.first?.url,
               let url = URL(string: urlString) else { return }

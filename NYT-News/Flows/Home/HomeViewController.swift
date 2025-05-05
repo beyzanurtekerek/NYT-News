@@ -15,6 +15,7 @@ enum Sections: Int {
 class HomeViewController: UIViewController {
     
     let sectionTitles: [String] = ["Breaking News", "Recommendation"]
+    private let viewModel = HomeViewModel()
     
     private var breakingNews: [New] = [New]()
     private var recommendations: [New] = [New]()
@@ -67,25 +68,11 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
-        view.addSubview(breakingNewsHeader)
-        view.addSubview(breakingNewsCollectionView)
-        view.addSubview(recommendationHeader)
-        view.addSubview(recommendationTableView)
-        view.addSubview(pageControl)
-        
-        breakingNewsCollectionView.backgroundColor = .clear
-        recommendationTableView.backgroundColor = .clear
-        
-        breakingNewsCollectionView.delegate = self
-        breakingNewsCollectionView.dataSource = self
-        recommendationTableView.delegate = self
-        recommendationTableView.dataSource = self
-        
+                
         configureNavbar()
-        fetchRecommendations()
-        fetchBreakingNews()
+        setupUI()
         applyConstraints()
+        fetchData()
     }
     
     override func viewDidLayoutSubviews() {
@@ -112,6 +99,23 @@ class HomeViewController: UIViewController {
         )
     }
     
+    private func setupUI() {
+        view.addSubview(breakingNewsHeader)
+        view.addSubview(breakingNewsCollectionView)
+        view.addSubview(recommendationHeader)
+        view.addSubview(recommendationTableView)
+        view.addSubview(pageControl)
+        
+        breakingNewsCollectionView.backgroundColor = .clear
+        recommendationTableView.backgroundColor = .clear
+        
+        breakingNewsCollectionView.delegate = self
+        breakingNewsCollectionView.dataSource = self
+        recommendationTableView.delegate = self
+        recommendationTableView.dataSource = self
+
+    }
+    
     private func applyConstraints() {
         let breakingNewsHeaderConstraints = [
             breakingNewsHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 110),
@@ -123,41 +127,29 @@ class HomeViewController: UIViewController {
             recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 60),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            recommendationHeader.heightAnchor.constraint(equalToConstant: 25)        ]
+            recommendationHeader.heightAnchor.constraint(equalToConstant: 25)
+        ]
         
         NSLayoutConstraint.activate(recommendationHeaderConstraints)
         NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
     }
     
-    func fetchBreakingNews() {
-        APICaller.shared.getTopStoriesHome { [weak self] result in
-            switch result {
-            case .success(let newsData):
-                self?.breakingNews = newsData
-                DispatchQueue.main.async {
-                    self?.breakingNewsCollectionView.reloadData()
-                    self?.pageControl.numberOfPages = newsData.count
-                }
-            case .failure(let error):
-                print("fetch Breaking News Error: \(error.localizedDescription)")
+    private func fetchData() {
+        viewModel.fetchBreakingNews { [weak self] news in
+            DispatchQueue.main.async {
+                self?.breakingNews = news
+                self?.breakingNewsCollectionView.reloadData()
+                self?.pageControl.numberOfPages = news.count
+            }
+        }
+
+        viewModel.fetchRecommendations { [weak self] news in
+            DispatchQueue.main.async {
+                self?.recommendations = news
+                self?.recommendationTableView.reloadData()
             }
         }
     }
-        
-    func fetchRecommendations() {
-        APICaller.shared.getTopStoriesTech { [weak self] result in
-            switch result {
-            case .success(let recommendationData):
-                self?.recommendations = recommendationData
-                DispatchQueue.main.async {
-                    self?.recommendationTableView.reloadData()
-                }
-            case .failure(let error):
-                print("fetch Recommendation Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
 }
 
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -169,23 +161,24 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BreakingNewsCollectionViewCell.identifier, for: indexPath) as? BreakingNewsCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let model = breakingNews[indexPath.row]
-        cell.configure(with: model)
-        
-        cell.contentView.layer.cornerRadius = 10
-        cell.contentView.layer.masksToBounds = true
-        
+        guard let model = viewModel.breakingNewsItem(at: indexPath.row) else {
+            return UICollectionViewCell()
+        }
+        cell.configureWithNews(with: model)
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedNews = breakingNews[indexPath.row]
-        let vc = HomeDetailViewController()
-        vc.news = selectedNews
-        vc.configure(with: selectedNews)
-        navigationController?.pushViewController(vc, animated: true)
+        navigateToBreakingNewsDetail(at: indexPath.row)
     }
     
+    private func navigateToBreakingNewsDetail(at index: Int) {
+        guard let selectedNews = viewModel.breakingNewsItem(at: index) else { return }
+        let vc = HomeDetailViewController()
+        vc.news = selectedNews
+        vc.configureWithNews(with: selectedNews)
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
@@ -201,8 +194,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationTableViewCell.identifier, for: indexPath) as? RecommendationTableViewCell else {
             return UITableViewCell()
         }
-        let model = recommendations[indexPath.row]
-        cell.configure(with: model)
+        guard let model = viewModel.recommendationItem(at: indexPath.row) else {
+            return UITableViewCell()
+        }
+        cell.configureWithNews(with: model)
         return cell
     }
     
@@ -211,8 +206,17 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updatePageControlForScrollView(scrollView)
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        navigateToRecommendationDetail(at: indexPath.row)
+    }
+    
+    func updatePageControlForScrollView(_ scrollView: UIScrollView) {
         if scrollView == breakingNewsCollectionView {
             let pageWidth = breakingNewsCollectionView.frame.width
+            guard pageWidth > 0 else { return }
             let currentPage = Int(breakingNewsCollectionView.contentOffset.x / pageWidth)
             pageControl.currentPage = currentPage
         } else if scrollView == recommendationTableView {
@@ -220,11 +224,11 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedNews = recommendations[indexPath.row]
+    private func navigateToRecommendationDetail(at index: Int) {
+        let selectedNews = recommendations[index]
         let vc = HomeDetailViewController()
         vc.news = selectedNews
-        vc.configure(with: selectedNews)
+        vc.configureWithNews(with: selectedNews)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

@@ -67,12 +67,8 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(articleImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(abstractLabel)
-        contentView.addSubview(dateLabel)
-        contentView.addSubview(sectionLabel)
         
+        setupUI()
         applyConstraints()
     }
     
@@ -90,7 +86,15 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         articleImageView.image = nil
     }
     
-    public func configure(with model: New) {
+    private func setupUI() {
+        contentView.addSubview(articleImageView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(abstractLabel)
+        contentView.addSubview(dateLabel)
+        contentView.addSubview(sectionLabel)
+    }
+    
+    public func configureWithNews(with model: New) {
         articleImageView.image = nil
         titleLabel.text = model.title
         abstractLabel.text = model.abstract
@@ -104,6 +108,9 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         } else {
             articleImageView.image = UIImage(named: "placeholder")
         }
+        
+        contentView.layer.cornerRadius = 10
+        contentView.layer.masksToBounds = true
     }
     
     private func applyConstraints() {
