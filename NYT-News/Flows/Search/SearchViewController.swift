@@ -10,27 +10,7 @@ import UIKit
 class SearchViewController: UIViewController {
     
     private var searchWorkItem: DispatchWorkItem?
-    private var searchNews: [New] = [New]()
-    private var searchResults: [Doc] = [Doc]()
-    private let categories = [
-        "World",
-        "Technology",
-        "Business",
-        "Sports",
-        "Food",
-        "Science",
-        "Movies",
-        "Books/review",
-        "Automobiles",
-        "Health",
-        "Arts",
-        "Politics",
-        "Travel",
-        "Style",
-        "Magazine",
-        "Fashion"
-    ]
-    private var selectedCategoryIndex = 0
+    private let viewModel = SearchViewModel()
     
     private let categoryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -81,22 +61,14 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
-        view.addSubview(categoryCollectionView)
-        view.addSubview(discoverCollectionView)
-        view.addSubview(discoverHeaderLabel)
-        view.addSubview(descriptionLabel)
-        view.addSubview(searchBar)
-        
-        categoryCollectionView.delegate = self
-        categoryCollectionView.dataSource = self
-        discoverCollectionView.delegate = self
-        discoverCollectionView.dataSource = self
-        searchBar.delegate = self
-        
+                        
         configureNavbar()
+        setupUI()
         applyConstraints()
-        fetchInitialCategoryNews()
+        viewModel.onNewsUpdated = { [weak self] in
+            self?.discoverCollectionView.reloadData()
+        }
+        viewModel.fetchInitialCategoryNews()
     }
     
     override func viewDidLayoutSubviews() {
@@ -118,6 +90,19 @@ class SearchViewController: UIViewController {
         )
     }
     
+    private func setupUI() {
+        view.addSubview(categoryCollectionView)
+        view.addSubview(discoverCollectionView)
+        view.addSubview(discoverHeaderLabel)
+        view.addSubview(descriptionLabel)
+        view.addSubview(searchBar)
+        
+        categoryCollectionView.delegate = self
+        categoryCollectionView.dataSource = self
+        discoverCollectionView.delegate = self
+        discoverCollectionView.dataSource = self
+        searchBar.delegate = self
+    }
     
     private func applyConstraints() {
         let discoverHeaderLabelConstraints = [
@@ -140,31 +125,14 @@ class SearchViewController: UIViewController {
         NSLayoutConstraint.activate(searchBarConstraints)
     }
     
-    private func fetchInitialCategoryNews() {
-        let selectedCategory = categories[selectedCategoryIndex]
-        APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let news):
-                    self?.searchNews = news
-                    self?.discoverCollectionView.reloadData()
-                case .failure(let error):
-                    print("Initial fetch error: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-
 }
 // MARK: - Category and Discover Collection View
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == categoryCollectionView {
-            print("Search News Count: \(searchNews.count)")
-            return categories.count
+            return viewModel.categoryCount
         } else if collectionView == discoverCollectionView {
-            print("Search Results Count: \(searchResults.count)")
-            return searchBar.text?.isEmpty == false ? searchResults.count : searchNews.count
+            return searchBar.text?.isEmpty == false ? viewModel.searchResultsCount : viewModel.searchNewsCount
         }
         return 0
     }
@@ -174,20 +142,20 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            cell.configure(with: categories[indexPath.item], isSelected: indexPath.item == selectedCategoryIndex)
+            let category = viewModel.category(at: indexPath.item)
+            let isSelected = indexPath.item == viewModel.selectedCategoryIndex
+            cell.configure(with: category, isSelected: isSelected)
             return cell
         } else if collectionView == discoverCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiscoverCollectionViewCell.identifier, for: indexPath) as? DiscoverCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            if searchBar.text?.isEmpty == false {
-                let result = searchResults[indexPath.item]
-                cell.configure(with: result)
-                cell.delegate = self
+            if let searchText = searchBar.text, !searchText.isEmpty {
+                let result = viewModel.searchResult(at: indexPath.item)
+                cell.configureWithDoc(with: result)
             } else {
-                let news = searchNews[indexPath.item]
-                cell.configure(with: news)
-                cell.delegate = self
+                let news = viewModel.newsItem(at: indexPath.item)
+                cell.configureWithNew(with: news)
             }
             return cell
         }
@@ -196,24 +164,12 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == categoryCollectionView {
-            selectedCategoryIndex = indexPath.item
             
             searchBar.text = ""
-            
-            let selectedCategory = categories[selectedCategoryIndex]
-            APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let news):
-                        let filteredNews = news.filter { $0.section?.lowercased() == selectedCategory.lowercased()}
-                        self?.searchNews = filteredNews
-                        self?.discoverCollectionView.reloadData()
-                    case .failure(let error):
-                        print(error.localizedDescription)
-                    }
-                }
+            viewModel.didSelectCategory(at: indexPath.item) { [weak self] in
+                self?.categoryCollectionView.reloadData()
             }
-            categoryCollectionView.reloadData()
+                
         } else if collectionView == discoverCollectionView {
             // search vc de haber cell tıklanırsa yapılacaklar burada
         }
@@ -235,32 +191,8 @@ extension SearchViewController: UISearchBarDelegate {
         searchWorkItem?.cancel()
         
         let workItem = DispatchWorkItem { [weak self] in
-            guard !searchText.isEmpty else {
-                let selectedCategory = self?.categories[self?.selectedCategoryIndex ?? 0] ?? ""
-                APICaller.shared.fetchNews(for: selectedCategory) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let news):
-                            self?.searchNews = news
-                            self?.discoverCollectionView.reloadData()
-                        case .failure(let error):
-                            print(error.localizedDescription)
-                        }
-                    }
-                }
-                return
-            }
-            
-            APICaller.shared.search(with: searchText) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let results):
-                        self?.searchResults = results
-                        self?.discoverCollectionView.reloadData()
-                    case .failure(let error):
-                        print(error.localizedDescription)
-                    }
-                }
+            self?.viewModel.performSearch(with: searchText) {
+                self?.discoverCollectionView.reloadData()
             }
         }
         

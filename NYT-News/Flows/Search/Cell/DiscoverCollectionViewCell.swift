@@ -112,6 +112,16 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        setupUI()
+        applyConstraints()
+        setupActions()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    private func setupUI() {
         contentView.addSubview(searchImageView)
         contentView.addSubview(abstractlabel)
         contentView.addSubview(dateLabel)
@@ -121,19 +131,15 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(readMoreButton)
         contentView.addSubview(saveButton)
         
-        applyConstraints()
-        readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
-        saveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
-        
         contentView.layer.cornerRadius = 12
         contentView.layer.borderWidth = 1
         contentView.layer.borderColor = UIColor.systemGray4.cgColor
         contentView.layer.masksToBounds = true
-        
     }
     
-    required init?(coder: NSCoder) {
-        fatalError()
+    private func setupActions() {
+        readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
+        saveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
     }
     
     @objc private func readMoreButtonClicked() {
@@ -238,7 +244,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate(saveButtonConstraints)
     }
     
-    public func configure(with model: Doc, isSaved: Bool = false) {
+    public func configureWithDoc(with model: Doc, isSaved: Bool = false) {
         self.docs = model
         headlineLabel.text = model.headline.main
         abstractlabel.text = model.abstract
@@ -270,7 +276,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    public func configure(with model: New, isSaved: Bool = false) {
+    public func configureWithNew(with model: New, isSaved: Bool = false) {
         self.news = model
         headlineLabel.text = model.title
         abstractlabel.text = model.abstract

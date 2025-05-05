@@ -21,17 +21,21 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBackground
-        contentView.layer.cornerRadius = 10
-        contentView.layer.masksToBounds = true
         
-        contentView.addSubview(sectionTitleLabel)
-        
+        setupUI()
         applyConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError()
+    }
+    
+    private func setupUI() {
+        contentView.backgroundColor = .systemBackground
+        contentView.layer.cornerRadius = 10
+        contentView.layer.masksToBounds = true
+        
+        contentView.addSubview(sectionTitleLabel)
     }
     
     private func applyConstraints() {

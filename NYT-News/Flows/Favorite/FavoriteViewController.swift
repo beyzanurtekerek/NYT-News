@@ -126,7 +126,7 @@ extension FavoriteViewController: UICollectionViewDelegate, UICollectionViewData
             multimedia: multimedia
         )
         
-        cell.configure(with: newModel)
+        cell.configureWithNew(with: newModel)
         cell.delegate = self
         return cell
     }
