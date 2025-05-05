@@ -1,5 +1,5 @@
 //
-//  SearchVC.swift
+//  SearchViewController.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 9.04.2025.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchVC: UIViewController {
+class SearchViewController: UIViewController {
     
     private var searchWorkItem: DispatchWorkItem?
     private var searchNews: [New] = [New]()
@@ -157,7 +157,7 @@ class SearchVC: UIViewController {
 
 }
 // MARK: - Category and Discover Collection View
-extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == categoryCollectionView {
             print("Search News Count: \(searchNews.count)")
@@ -230,7 +230,7 @@ extension SearchVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColl
     }
 }
 
-extension SearchVC: UISearchBarDelegate {
+extension SearchViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchWorkItem?.cancel()
         
@@ -270,7 +270,7 @@ extension SearchVC: UISearchBarDelegate {
 }
 
 // MARK: - DiscoverCollectionViewCellDelegate
-extension SearchVC: DiscoverCollectionViewCellDelegate {
+extension SearchViewController: DiscoverCollectionViewCellDelegate {
     func didTapSaveButton(on cell: DiscoverCollectionViewCell) {
         if let indexPath = discoverCollectionView.indexPath(for: cell) {
             discoverCollectionView.reloadItems(at: [indexPath])

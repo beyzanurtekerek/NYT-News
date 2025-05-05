@@ -1,5 +1,5 @@
 //
-//  HomeVC.swift
+//  HomeViewController.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 9.04.2025.
@@ -12,7 +12,7 @@ enum Sections: Int {
     case Recommendation
 }
 
-class HomeVC: UIViewController {
+class HomeViewController: UIViewController {
     
     let sectionTitles: [String] = ["Breaking News", "Recommendation"]
     
@@ -160,7 +160,7 @@ class HomeVC: UIViewController {
     
 }
 
-extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
+extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return breakingNews.count
     }
@@ -180,7 +180,7 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedNews = breakingNews[indexPath.row]
-        let vc = DetailVC()
+        let vc = HomeDetailViewController()
         vc.news = selectedNews
         vc.configure(with: selectedNews)
         navigationController?.pushViewController(vc, animated: true)
@@ -188,7 +188,7 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource {
     
 }
 
-extension HomeVC: UITableViewDelegate, UITableViewDataSource {
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recommendations.count
@@ -222,7 +222,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedNews = recommendations[indexPath.row]
-        let vc = DetailVC()
+        let vc = HomeDetailViewController()
         vc.news = selectedNews
         vc.configure(with: selectedNews)
         navigationController?.pushViewController(vc, animated: true)

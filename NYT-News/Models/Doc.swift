@@ -1,5 +1,5 @@
 //
-//  SearchVM.swift
+//  Doc.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 15.04.2025.

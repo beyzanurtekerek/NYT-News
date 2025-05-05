@@ -1,5 +1,5 @@
 //
-//  DetailVC.swift
+//  HomeDetailViewController.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 11.04.2025.
@@ -8,7 +8,7 @@
 import UIKit
 import SDWebImage
 
-class DetailVC: UIViewController {
+class HomeDetailViewController: UIViewController {
 
     var news: New?
 

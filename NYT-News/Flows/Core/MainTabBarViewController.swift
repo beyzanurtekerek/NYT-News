@@ -1,5 +1,5 @@
 //
-//  MainTabBarVC.swift
+//  MainTabBarViewController.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 9.04.2025.
@@ -7,15 +7,15 @@
 
 import UIKit
 
-class MainTabBarVC: UITabBarController {
+class MainTabBarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        let vc1 = UINavigationController(rootViewController: HomeVC())
-        let vc2 = UINavigationController(rootViewController: SearchVC())
-        let vc3 = UINavigationController(rootViewController: SavedVC())
+        let vc1 = UINavigationController(rootViewController: HomeViewController())
+        let vc2 = UINavigationController(rootViewController: SearchViewController())
+        let vc3 = UINavigationController(rootViewController: FavoriteViewController())
         
         vc1.tabBarItem.image = UIImage(systemName: "house")
         vc2.tabBarItem.image = UIImage(systemName: "magnifyingglass")

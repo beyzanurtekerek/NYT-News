@@ -1,5 +1,5 @@
 //
-//  SavedVC.swift
+//  FavoriteViewController.swift
 //  NYT-News
 //
 //  Created by Beyza Nur Tekerek on 9.04.2025.
@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class SavedVC: UIViewController {
+class FavoriteViewController: UIViewController {
 
     private var savedArticles: [SavedArticle] = []
     
@@ -96,7 +96,7 @@ class SavedVC: UIViewController {
     
 }
 
-extension SavedVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension FavoriteViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return savedArticles.count
     }
@@ -137,7 +137,7 @@ extension SavedVC: UICollectionViewDelegate, UICollectionViewDataSource, UIColle
     }
 }
 
-extension SavedVC: DiscoverCollectionViewCellDelegate {
+extension FavoriteViewController: DiscoverCollectionViewCellDelegate {
     func didTapSaveButton(on cell: DiscoverCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let article = savedArticles[indexPath.item]
