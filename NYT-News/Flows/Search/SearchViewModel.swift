@@ -9,9 +9,9 @@ import Foundation
 
 class SearchViewModel {
     private let categories = [
-        "World", "Technology", "Business", "Sports", "Food",
-        "Science", "Movies", "Books/review", "Automobiles",
-        "Health", "Arts", "Politics", "Travel", "Style", "Magazine", "Fashion"
+        "World", "Technology", "Business", "Food",
+        "Science", "Movies", "Automobiles",
+        "Health", "Arts", "Politics", "Travel", "Style", "Fashion"
     ]
     
     private(set) var searchNews: [New] = []
@@ -52,13 +52,16 @@ class SearchViewModel {
                 switch result {
                 case .success(let news):
                     let filteredNews = news.filter { $0.section?.lowercased() == selectedCategory.lowercased() }
+                    print("Selected Category: \(selectedCategory)")
+                    print("Filtered News Count: \(filteredNews.count)")
                     self?.searchNews = filteredNews
                     self?.searchResults = []
                     self?.onNewsUpdated?()
-                    completion()
                 case .failure(let error):
                     print(error.localizedDescription)
+                    self?.searchNews = []
                 }
+                completion()
             }
         }
     }

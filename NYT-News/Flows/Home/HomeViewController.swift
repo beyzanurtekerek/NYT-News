@@ -14,7 +14,8 @@ enum Sections: Int {
 
 class HomeViewController: UIViewController {
     
-    let sectionTitles: [String] = ["Breaking News", "Recommendation"]
+    // MARK: - Properties
+    private let sectionTitles: [String] = ["Breaking News", "Recommendation"]
     private let viewModel = HomeViewModel()
     
     private var breakingNews: [New] = [New]()
@@ -65,6 +66,7 @@ class HomeViewController: UIViewController {
         return pageControl
     }()
     
+    // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -99,6 +101,7 @@ class HomeViewController: UIViewController {
         )
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         view.addSubview(breakingNewsHeader)
         view.addSubview(breakingNewsCollectionView)
@@ -113,9 +116,9 @@ class HomeViewController: UIViewController {
         breakingNewsCollectionView.dataSource = self
         recommendationTableView.delegate = self
         recommendationTableView.dataSource = self
-
     }
     
+    // MARK: - Constraints
     private func applyConstraints() {
         let breakingNewsHeaderConstraints = [
             breakingNewsHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 110),
@@ -134,6 +137,7 @@ class HomeViewController: UIViewController {
         NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
     }
     
+    // MARK: - Data Fetching
     private func fetchData() {
         viewModel.fetchBreakingNews { [weak self] news in
             DispatchQueue.main.async {
@@ -148,6 +152,35 @@ class HomeViewController: UIViewController {
                 self?.recommendations = news
                 self?.recommendationTableView.reloadData()
             }
+        }
+    }
+    
+    // MARK: - Navigation
+    private func navigateToBreakingNewsDetail(at index: Int) {
+        guard let selectedNews = viewModel.breakingNewsItem(at: index) else { return }
+        let vc = HomeDetailViewController()
+        vc.news = selectedNews
+        vc.configureWithNews(with: selectedNews)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func navigateToRecommendationDetail(at index: Int) {
+        let selectedNews = recommendations[index]
+        let vc = HomeDetailViewController()
+        vc.news = selectedNews
+        vc.configureWithNews(with: selectedNews)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    // MARK: - ScrollView Handling
+    func updatePageControlForScrollView(_ scrollView: UIScrollView) {
+        if scrollView == breakingNewsCollectionView {
+            let pageWidth = breakingNewsCollectionView.frame.width
+            guard pageWidth > 0 else { return }
+            let currentPage = Int(breakingNewsCollectionView.contentOffset.x / pageWidth)
+            pageControl.currentPage = currentPage
+        } else if scrollView == recommendationTableView {
+            navigationController?.navigationBar.alpha = 1
         }
     }
 }
@@ -170,14 +203,6 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         navigateToBreakingNewsDetail(at: indexPath.row)
-    }
-    
-    private func navigateToBreakingNewsDetail(at index: Int) {
-        guard let selectedNews = viewModel.breakingNewsItem(at: index) else { return }
-        let vc = HomeDetailViewController()
-        vc.news = selectedNews
-        vc.configureWithNews(with: selectedNews)
-        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -205,30 +230,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         return 130
     }
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        updatePageControlForScrollView(scrollView)
-    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         navigateToRecommendationDetail(at: indexPath.row)
-    }
-    
-    func updatePageControlForScrollView(_ scrollView: UIScrollView) {
-        if scrollView == breakingNewsCollectionView {
-            let pageWidth = breakingNewsCollectionView.frame.width
-            guard pageWidth > 0 else { return }
-            let currentPage = Int(breakingNewsCollectionView.contentOffset.x / pageWidth)
-            pageControl.currentPage = currentPage
-        } else if scrollView == recommendationTableView {
-            navigationController?.navigationBar.alpha = 1
-        }
-    }
-    
-    private func navigateToRecommendationDetail(at index: Int) {
-        let selectedNews = recommendations[index]
-        let vc = HomeDetailViewController()
-        vc.news = selectedNews
-        vc.configureWithNews(with: selectedNews)
-        navigationController?.pushViewController(vc, animated: true)
     }
 }
