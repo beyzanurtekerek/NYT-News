@@ -10,7 +10,8 @@ import CoreData
 
 class FavoriteViewController: UIViewController {
 
-    private var savedArticles: [SavedArticle] = []
+    // MARK: - Properties
+    private let viewModel = FavoriteViewModel()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -29,30 +30,19 @@ class FavoriteViewController: UIViewController {
         collectionView.register(DiscoverCollectionViewCell.self, forCellWithReuseIdentifier: DiscoverCollectionViewCell.identifier)
         return collectionView
     }()
-
     
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: .didChangeSavedStatus, object: nil)
-        
-        view.addSubview(titleLabel)
-        view.addSubview(collectionView)
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
         
         configureNavbar()
+        setupUI()
         applyConstraints()
         fetchSavedArticles()
-        updateUI()
     }
     
     @objc func refreshData() {
-        fetchSavedArticles()
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-        }
+        viewModel.fetchSavedArticles()
     }
     
     override func viewDidLayoutSubviews() {
@@ -67,6 +57,20 @@ class FavoriteViewController: UIViewController {
         )
     }
     
+    // MARK: - UI Setup
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: .didChangeSavedStatus, object: nil)
+        
+        view.addSubview(titleLabel)
+        view.addSubview(collectionView)
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        viewModel.delegate = self
+    }
+    
+    // MARK: - Constraints
     private func applyConstraints() {
         let titleLabelConstraints = [
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -76,56 +80,29 @@ class FavoriteViewController: UIViewController {
         NSLayoutConstraint.activate(titleLabelConstraints)
     }
     
+    // MARK: - Data Fetching
+    private func fetchSavedArticles() {
+        viewModel.fetchSavedArticles()
+    }
+    
+    // MARK: - UI Updates
     func updateUI() {
         self.collectionView.reloadData()
     }
     
-    private func fetchSavedArticles() {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let request: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
-        
-        do {
-            savedArticles = try context.fetch(request)
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
-        } catch {
-            print("Failed to fetch saved articles: \(error.localizedDescription)")
-        }
-    }
-    
 }
 
+// MARK: - UICollectionViewDelegate & DataSource
 extension FavoriteViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return savedArticles.count
+        return viewModel.savedArticles.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiscoverCollectionViewCell.identifier, for: indexPath) as? DiscoverCollectionViewCell else {
             return UICollectionViewCell()
         }
-        
-        let article = savedArticles[indexPath.row]
-        
-        let multimedia: [Multimedia]? = {
-            if let imageUrl = article.imageUrl {
-                return [Multimedia(url: imageUrl)]
-            } else {
-                return nil
-            }
-        }()
-        
-        let newModel = New(
-            section: article.section ?? "",
-            title: article.title ?? "",
-            abstract: article.abstractText ?? "",
-            url: article.url ?? "",
-            byline: article.byline ?? "",
-            published_date: article.publishedDate,
-            multimedia: multimedia
-        )
-        
+        let newModel = viewModel.articleAsNew(at: indexPath.row)
         cell.configureWithNew(with: newModel)
         cell.delegate = self
         return cell
@@ -137,122 +114,26 @@ extension FavoriteViewController: UICollectionViewDelegate, UICollectionViewData
     }
 }
 
-extension FavoriteViewController: DiscoverCollectionViewCellDelegate {
-    func didTapSaveButton(on cell: DiscoverCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        let article = savedArticles[indexPath.item]
-        guard let source = article.source else { return }
-
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let fetchRequest: NSFetchRequest<SavedArticle> = SavedArticle.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "url == %@", article.url ?? "")
-
-        do {
-            let existing = try context.fetch(fetchRequest)
-
-            if existing.isEmpty {
-                
-                switch source {
-                case "New":
-                    let newModel = New(
-                        section: article.section ?? "",
-                        title: article.title ?? "",
-                        abstract: article.abstractText ?? "",
-                        url: article.url ?? "",
-                        byline: article.byline ?? "",
-                        published_date: article.publishedDate,
-                        multimedia: article.imageUrl != nil ? [Multimedia(url: article.imageUrl!)] : nil
-                    )
-                    DataPersistenceManager.shared.saveArticle(from: newModel) { result in
-                        self.handleSaveResult(result)
-                    }
-
-                case "Doc":
-                    let docModel = Doc(
-                        abstract: article.abstractText,
-                        byline: Byline(original: article.byline),
-                        multimedia: SearchMultimedia(multimediaDefault: Default(url: article.imageUrl)),
-                        pub_date: article.publishedDate,
-                        headline: Headline(main: article.title),
-                        section_name: article.section,
-                        web_url: article.url
-                    )
-                    DataPersistenceManager.shared.saveArticle(from: docModel) { result in
-                        self.handleSaveResult(result)
-                    }
-
-                default:
-                    print("Unknown article type.")
-                }
-
-            } else {
-                
-                switch source {
-                case "New":
-                    let newModel = New(
-                        section: article.section ?? "",
-                        title: article.title ?? "",
-                        abstract: article.abstractText ?? "",
-                        url: article.url ?? "",
-                        byline: article.byline ?? "",
-                        published_date: article.publishedDate,
-                        multimedia: article.imageUrl != nil ? [Multimedia(url: article.imageUrl!)] : nil
-                    )
-                    DataPersistenceManager.shared.deleteArticle(from: newModel) { result in
-                        self.handleDeleteResult(result, indexPath: indexPath)
-                    }
-
-                case "Doc":
-                    let docModel = Doc(
-                        abstract: article.abstractText,
-                        byline: Byline(original: article.byline),
-                        multimedia: SearchMultimedia(multimediaDefault: Default(url: article.imageUrl)),
-                        pub_date: article.publishedDate,
-                        headline: Headline(main: article.title),
-                        section_name: article.section,
-                        web_url: article.url
-                    )
-                    DataPersistenceManager.shared.deleteArticle(from: docModel) { result in
-                        self.handleDeleteResult(result, indexPath: indexPath)
-                    }
-
-                default:
-                    print("Unknown article type.")
-                }
-            }
-        } catch {
-            print("Fetch failed: \(error.localizedDescription)")
-        }
-    }
-
-    private func handleDeleteResult(_ result: Result<Void, Error>, indexPath: IndexPath) {
-        switch result {
-        case .success():
-            print("Deleted from saved.")
-            savedArticles.remove(at: indexPath.item)
-            DispatchQueue.main.async {
-                self.collectionView.deleteItems(at: [indexPath])
-                self.view.showToast(message: "Unsaved successfully")
-            }
-        case .failure(let error):
-            print("Error deleting: \(error.localizedDescription)")
+// MARK: - FavoriteViewModelDelegate
+extension FavoriteViewController: FavoriteViewModelDelegate {
+    func didUpdateArticles() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
         }
     }
     
-    private func handleSaveResult(_ result: Result<Void, Error>) {
-        switch result {
-        case .success():
-            print("Saved successfully.")
-            DispatchQueue.main.async {
-                self.view.showToast(message: "Saved successfully")
-            }
-            fetchSavedArticles()
-        case .failure(let error):
-            print("Error saving: \(error.localizedDescription)")
-            DispatchQueue.main.async {
-                self.view.showToast(message: "Failed to save article.")
-            }
-
+    func showToast(message: String) {
+        DispatchQueue.main.async {
+            self.view.showToast(message: message)
         }
+    }
+}
+
+// MARK: - DiscoverCollectionViewCellDelegate
+extension FavoriteViewController: DiscoverCollectionViewCellDelegate {
+    func didTapSaveButton(on cell: DiscoverCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        let article = viewModel.savedArticles[indexPath.item]
+        viewModel.toggleSaveStatus(for: article, indexPath: indexPath)
     }
 }
