@@ -18,6 +18,11 @@ class FavoriteViewModel {
     // MARK: - Properties
     private(set) var savedArticles: [SavedArticle] = []
     weak var delegate: FavoriteViewModelDelegate?
+    private let dataPersistence: DataPersistenceManager
+
+    init(dataPersistence: DataPersistenceManager = DataPersistenceManager.shared) {
+        self.dataPersistence = dataPersistence
+    }
 
     // MARK: - Data Fetching
     func fetchSavedArticles() {

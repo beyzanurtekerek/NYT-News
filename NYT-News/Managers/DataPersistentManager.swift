@@ -19,17 +19,21 @@ class DataPersistenceManager {
     
     static let shared = DataPersistenceManager()
     
+    var persistentContainer: NSPersistentContainer {
+        return (UIApplication.shared.delegate as! AppDelegate).persistentContainer
+    }
+    
     func saveArticle(from new: New, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         let item = SavedArticle(context: context)
-        item.title = new.title
-        item.abstractText = new.abstract
-        item.url = new.url
+        item.title = new.title ?? ""
+        item.abstractText = new.abstract ?? ""
+        item.url = new.url ?? ""
         item.imageUrl = new.multimedia?.first?.url ?? ""
         item.publishedDate = new.published_date
-        item.section = new.section
-        item.byline = new.byline
+        item.section = new.section ?? ""
+        item.byline = new.byline ?? ""
         item.source = "new"
         do {
             try context.save()
@@ -43,13 +47,13 @@ class DataPersistenceManager {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         let item = SavedArticle(context: context)
-        item.title = doc.headline.main
-        item.abstractText = doc.abstract
-        item.url = doc.web_url
+        item.title = doc.headline.main ?? ""
+        item.abstractText = doc.abstract ?? ""
+        item.url = doc.web_url ?? ""
         item.imageUrl = doc.multimedia.multimediaDefault?.url ?? ""
         item.publishedDate = doc.pub_date
-        item.section = doc.section_name
-        item.byline = doc.byline.original
+        item.section = doc.section_name ?? ""
+        item.byline = doc.byline.original ?? ""
         item.source = "doc"
         do {
             try context.save()

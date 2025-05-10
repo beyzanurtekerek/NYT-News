@@ -11,8 +11,14 @@ class HomeViewModel {
     var breakingNews: [New] = []
     var recommendations: [New] = []
     
+    private let apiCaller: APICaller
+    
+    init(apiCaller: APICaller = .shared) {
+        self.apiCaller = apiCaller
+    }
+    
     func fetchBreakingNews(completion: @escaping ([New]) -> Void) {
-        APICaller.shared.getTopStoriesHome { result in
+        apiCaller.getTopStoriesHome { result in
             switch result {
             case .success(let newsData):
                 self.breakingNews = newsData
@@ -25,7 +31,7 @@ class HomeViewModel {
     }
 
     func fetchRecommendations(completion: @escaping ([New]) -> Void) {
-        APICaller.shared.getTopStoriesTech { result in
+        apiCaller.getTopStoriesTech { result in
             switch result {
             case .success(let newsData):
                 self.recommendations = newsData
