@@ -11,9 +11,9 @@ class HomeViewModel {
     var breakingNews: [New] = []
     var recommendations: [New] = []
     
-    private let apiCaller: APICaller
+    private let apiCaller: NewsAPI
     
-    init(apiCaller: APICaller = .shared) {
+    init(apiCaller: NewsAPI = APICaller.shared) {
         self.apiCaller = apiCaller
     }
     

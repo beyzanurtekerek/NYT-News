@@ -16,7 +16,7 @@ class HomeViewController: UIViewController {
     
     // MARK: - Properties
     private let sectionTitles: [String] = ["Breaking News", "Recommendation"]
-    private let viewModel = HomeViewModel()
+    private let viewModel = HomeViewModel(apiCaller: APICaller.shared)
     
     private var breakingNews: [New] = [New]()
     private var recommendations: [New] = [New]()

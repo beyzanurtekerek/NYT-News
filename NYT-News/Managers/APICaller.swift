@@ -16,7 +16,14 @@ enum APIError: Error {
     case failedToGetData
 }
 
-class APICaller {
+protocol NewsAPI {
+    func getTopStoriesHome(completion: @escaping (Result<[New], Error>) -> Void)
+    func getTopStoriesTech(completion: @escaping (Result<[New], Error>) -> Void)
+    func search(with query: String, completion: @escaping (Result<[Doc], Error>) -> Void)
+    func fetchNews(for category: String, completion: @escaping (Result<[New], Error>) -> Void)
+}
+
+class APICaller: NewsAPI {
     
     static let shared = APICaller()
     
