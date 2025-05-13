@@ -116,9 +116,9 @@ extension FavoriteViewController: UICollectionViewDelegate, UICollectionViewData
 
 // MARK: - FavoriteViewModelDelegate
 extension FavoriteViewController: FavoriteViewModelDelegate {
-    func didUpdateArticles() {
+    func didFetchSavedArticles(_ articles: [SavedArticle]) {
         DispatchQueue.main.async {
-            self.collectionView.reloadData()
+            self.updateUI()
         }
     }
     

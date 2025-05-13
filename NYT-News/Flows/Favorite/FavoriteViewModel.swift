@@ -10,7 +10,7 @@ import CoreData
 import UIKit
 
 protocol FavoriteViewModelDelegate: AnyObject {
-    func didUpdateArticles()
+    func didFetchSavedArticles(_ articles: [SavedArticle])
     func showToast(message: String)
 }
 
@@ -32,7 +32,7 @@ class FavoriteViewModel {
         do {
             savedArticles = try context.fetch(request)
             DispatchQueue.main.async {
-                self.delegate?.didUpdateArticles()
+                self.delegate?.didFetchSavedArticles(self.savedArticles)
             }
         } catch {
             print("Failed to fetch saved articles: \(error.localizedDescription)")
@@ -167,7 +167,7 @@ class FavoriteViewModel {
             print("Deleted from saved.")
             savedArticles.remove(at: indexPath.item)
             DispatchQueue.main.async {
-                self.delegate?.didUpdateArticles()
+                self.delegate?.didFetchSavedArticles(self.savedArticles)
                 self.delegate?.showToast(message: "Unsaved successfully")
             }
         case .failure(let error):
