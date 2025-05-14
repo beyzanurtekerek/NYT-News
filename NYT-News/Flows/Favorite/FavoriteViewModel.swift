@@ -56,6 +56,7 @@ class FavoriteViewModel {
     
     // MARK: - Save/Unsaving Logic
     func toggleSaveStatus(for article: SavedArticle, indexPath: IndexPath) {
+        guard let url = article.url, !url.isEmpty else { return }
         guard let source = article.source else { return }
 
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -172,6 +173,9 @@ class FavoriteViewModel {
             }
         case .failure(let error):
             print("Error deleting: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.delegate?.showToast(message: "Failed to unsave article.")
+            }
         }
     }
 }
