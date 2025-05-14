@@ -31,6 +31,7 @@ class HomeViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(BreakingNewsCollectionViewCell.self, forCellWithReuseIdentifier: BreakingNewsCollectionViewCell.identifier)
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
@@ -38,6 +39,7 @@ class HomeViewController: UIViewController {
         let table = UITableView(frame: .zero, style: .grouped)
         table.register(RecommendationTableViewCell.self, forCellReuseIdentifier: RecommendationTableViewCell.identifier)
         table.separatorStyle = .none
+        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -70,35 +72,11 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-                
+        
         configureNavbar()
         setupUI()
         applyConstraints()
         fetchData()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let padding: CGFloat = 16
-        
-        breakingNewsCollectionView.frame = CGRect(
-            x: 0,
-            y: breakingNewsHeader.frame.maxY + padding,
-            width: view.frame.width,
-            height: 250
-        )
-        pageControl.frame = CGRect(
-            x: (view.frame.width - 200) / 2,
-            y: breakingNewsCollectionView.frame.maxY + padding,
-            width: 200,
-            height: 20
-        )
-        recommendationTableView.frame = CGRect(
-            x: 0,
-            y: recommendationHeader.frame.maxY,
-            width: view.frame.width,
-            height: view.frame.height
-        )
     }
     
     // MARK: - UI Setup
@@ -126,15 +104,34 @@ class HomeViewController: UIViewController {
             breakingNewsHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             breakingNewsHeader.heightAnchor.constraint(equalToConstant: 30)
         ]
+        let breakingNewsCollectionViewConstraints = [
+            breakingNewsCollectionView.topAnchor.constraint(equalTo: breakingNewsHeader.bottomAnchor, constant: 8),
+            breakingNewsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            breakingNewsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            breakingNewsCollectionView.heightAnchor.constraint(equalToConstant: 250)
+        ]
+        let pageControlConstraints = [
+            pageControl.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 8),
+            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pageControl.heightAnchor.constraint(equalToConstant: 20)
+        ]
         let recommendationHeaderConstraints = [
             recommendationHeader.topAnchor.constraint(equalTo: breakingNewsCollectionView.bottomAnchor, constant: 60),
             recommendationHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             recommendationHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             recommendationHeader.heightAnchor.constraint(equalToConstant: 25)
         ]
-        
-        NSLayoutConstraint.activate(recommendationHeaderConstraints)
+        let recommendationTableViewConstraints = [
+            recommendationTableView.topAnchor.constraint(equalTo: recommendationHeader.bottomAnchor, constant: 8),
+            recommendationTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            recommendationTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            recommendationTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ]
         NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
+        NSLayoutConstraint.activate(breakingNewsCollectionViewConstraints)
+        NSLayoutConstraint.activate(pageControlConstraints)
+        NSLayoutConstraint.activate(recommendationHeaderConstraints)
+        NSLayoutConstraint.activate(recommendationTableViewConstraints)
     }
     
     // MARK: - Data Fetching
@@ -146,7 +143,7 @@ class HomeViewController: UIViewController {
                 self?.pageControl.numberOfPages = news.count
             }
         }
-
+        
         viewModel.fetchRecommendations { [weak self] news in
             DispatchQueue.main.async {
                 self?.recommendations = news
@@ -173,7 +170,11 @@ class HomeViewController: UIViewController {
     }
     
     // MARK: - ScrollView Handling
-    func updatePageControlForScrollView(_ scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updatePageControlForScrollView(scrollView)
+    }
+    
+    private func updatePageControlForScrollView(_ scrollView: UIScrollView) {
         if scrollView == breakingNewsCollectionView {
             let pageWidth = breakingNewsCollectionView.frame.width
             guard pageWidth > 0 else { return }
@@ -200,7 +201,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         cell.configureWithNews(with: model)
         return cell
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         navigateToBreakingNewsDetail(at: indexPath.row)
     }
@@ -229,7 +230,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 130
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         navigateToRecommendationDetail(at: indexPath.row)
     }
