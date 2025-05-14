@@ -9,9 +9,9 @@ import UIKit
 import SDWebImage
 
 class HomeDetailViewController: UIViewController {
-
+    
     var news: New?
-
+    
     private let customNavBar: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
@@ -46,7 +46,7 @@ class HomeDetailViewController: UIViewController {
         view.layer.cornerRadius = 25
         return view
     }()
-
+    
     private let navSaveButtonContainer: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .light)
         let view = UIVisualEffectView(effect: blurEffect)
@@ -57,7 +57,7 @@ class HomeDetailViewController: UIViewController {
     }()
     
     private let infoContainerView: UIView = {
-       let view = UIView()
+        let view = UIView()
         view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
@@ -66,7 +66,7 @@ class HomeDetailViewController: UIViewController {
     }()
     
     private let detailImageView: UIImageView = {
-       let imageView = UIImageView()
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -110,7 +110,7 @@ class HomeDetailViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     private let readMoreButton: UIButton = {
         let button = UIButton()
         button.setTitle("Read More", for: .normal)
@@ -132,7 +132,7 @@ class HomeDetailViewController: UIViewController {
         
         customNavBar.addSubview(navBackButtonContainer)
         customNavBar.addSubview(navSaveButtonContainer)
-
+        
         navBackButtonContainer.contentView.addSubview(navBackButton)
         navSaveButtonContainer.contentView.addSubview(navSaveButton)
         
@@ -144,9 +144,9 @@ class HomeDetailViewController: UIViewController {
         applyConstraints()
         setupReadMoreButton()
         setupNavBar()
-
+        
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
@@ -206,7 +206,7 @@ class HomeDetailViewController: UIViewController {
         readMoreButton.addTarget(self, action: #selector(readMoreButtonClicked), for: .touchUpInside)
     }
     
-
+    
     @objc private func readMoreButtonClicked() {
         guard let urlString = news?.url,
               let url = URL(string: urlString) else { return }
@@ -279,18 +279,22 @@ class HomeDetailViewController: UIViewController {
             readMoreButton.bottomAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: -50)
         ]
         
-        NSLayoutConstraint.activate(customNavBarConstraints)
-        NSLayoutConstraint.activate(navSaveButtonConstraints)
-        NSLayoutConstraint.activate(navBackButtonConstraints)
-        NSLayoutConstraint.activate(navSaveButtonContainerConstraints)
-        NSLayoutConstraint.activate(navBackButtonContainerConstraints)
-        NSLayoutConstraint.activate(infoContainerViewConstraints)
-        NSLayoutConstraint.activate(detailImageViewConstraints)
-        NSLayoutConstraint.activate(sectionLabelConstraints)
-        NSLayoutConstraint.activate(titleLabelConstraints)
-        NSLayoutConstraint.activate(bylineLabelConstraints)
-        NSLayoutConstraint.activate(abstractLabelConstraints)
-        NSLayoutConstraint.activate(readMoreButtonConstraints)
+        let allConstraints = [
+            customNavBarConstraints,
+            navSaveButtonConstraints,
+            navBackButtonConstraints,
+            navSaveButtonContainerConstraints,
+            navBackButtonContainerConstraints,
+            infoContainerViewConstraints,
+            detailImageViewConstraints,
+            sectionLabelConstraints,
+            titleLabelConstraints,
+            bylineLabelConstraints,
+            abstractLabelConstraints,
+            readMoreButtonConstraints
+        ].flatMap { $0 }
+        
+        NSLayoutConstraint.activate(allConstraints)
         
     }
     

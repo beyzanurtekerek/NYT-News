@@ -127,11 +127,18 @@ class HomeViewController: UIViewController {
             recommendationTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             recommendationTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
-        NSLayoutConstraint.activate(breakingNewsHeaderConstraints)
-        NSLayoutConstraint.activate(breakingNewsCollectionViewConstraints)
-        NSLayoutConstraint.activate(pageControlConstraints)
-        NSLayoutConstraint.activate(recommendationHeaderConstraints)
-        NSLayoutConstraint.activate(recommendationTableViewConstraints)
+        
+        
+        let allConstraints = [
+            breakingNewsHeaderConstraints,
+            breakingNewsCollectionViewConstraints,
+            pageControlConstraints,
+            recommendationHeaderConstraints,
+            recommendationTableViewConstraints
+        ].flatMap { $0 }
+        
+        NSLayoutConstraint.activate(allConstraints)
+
     }
     
     // MARK: - Data Fetching

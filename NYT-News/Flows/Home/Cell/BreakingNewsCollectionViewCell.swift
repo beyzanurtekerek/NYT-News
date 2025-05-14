@@ -100,7 +100,7 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
         abstractLabel.text = model.abstract
         dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "")
         sectionLabel.text = model.section?.uppercased()
-
+        
         if let imageUrlString = model.multimedia?.first?.url,
            let imageUrl = URL(string: imageUrlString) {
             
@@ -141,12 +141,15 @@ class BreakingNewsCollectionViewCell: UICollectionViewCell {
             abstractLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ]
         
+        let allConstraints = [
+            articleImageViewConstraints,
+            titleLabelConstraints,
+            abstractLabelConstraints,
+            dateLabelConstraints,
+            sectionLabelConstraints
+        ].flatMap { $0 }
         
-        NSLayoutConstraint.activate(articleImageViewConstraints)
-        NSLayoutConstraint.activate(titleLabelConstraints)
-        NSLayoutConstraint.activate(abstractLabelConstraints)
-        NSLayoutConstraint.activate(dateLabelConstraints)
-        NSLayoutConstraint.activate(sectionLabelConstraints)
+        NSLayoutConstraint.activate(allConstraints)
     }
     
 }

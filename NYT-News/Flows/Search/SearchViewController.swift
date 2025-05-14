@@ -120,9 +120,13 @@ class SearchViewController: UIViewController {
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
         ]
 
-        NSLayoutConstraint.activate(discoverHeaderLabelConstraints)
-        NSLayoutConstraint.activate(descriptionLabelConstraints)
-        NSLayoutConstraint.activate(searchBarConstraints)
+        let allConstraints = [
+            discoverHeaderLabelConstraints,
+            descriptionLabelConstraints,
+            searchBarConstraints
+        ].flatMap { $0 }
+        
+        NSLayoutConstraint.activate(allConstraints)
     }
     
 }

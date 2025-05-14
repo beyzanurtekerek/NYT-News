@@ -234,14 +234,19 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
             saveButton.widthAnchor.constraint(equalToConstant: 30),
             saveButton.heightAnchor.constraint(equalToConstant: 30)
         ]
-        NSLayoutConstraint.activate(searchImageViewConstraints)
-        NSLayoutConstraint.activate(headlineLabelConstraints)
-        NSLayoutConstraint.activate(abstractlabelConstraints)
-        NSLayoutConstraint.activate(dateLabelConstraints)
-        NSLayoutConstraint.activate(sectionLabelConstraints)
-        NSLayoutConstraint.activate(bylineLabelConstraints)
-        NSLayoutConstraint.activate(readMoreButtonConstraints)
-        NSLayoutConstraint.activate(saveButtonConstraints)
+        
+        let allConstraints = [
+            searchImageViewConstraints,
+            headlineLabelConstraints,
+            abstractlabelConstraints,
+            dateLabelConstraints,
+            sectionLabelConstraints,
+            bylineLabelConstraints,
+            readMoreButtonConstraints,
+            saveButtonConstraints
+        ].flatMap { $0 }
+        
+        NSLayoutConstraint.activate(allConstraints)
     }
     
     public func configureWithDoc(with model: Doc, isSaved: Bool = false) {

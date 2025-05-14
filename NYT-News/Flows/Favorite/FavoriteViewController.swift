@@ -9,7 +9,7 @@ import UIKit
 import CoreData
 
 class FavoriteViewController: UIViewController {
-
+    
     // MARK: - Properties
     private let viewModel = FavoriteViewModel()
     
