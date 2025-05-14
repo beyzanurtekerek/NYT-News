@@ -17,30 +17,29 @@ class HomeViewModel {
         self.apiCaller = apiCaller
     }
     
-    func fetchBreakingNews(completion: @escaping ([New]) -> Void) {
-        apiCaller.getTopStoriesHome { result in
+    func fetchNews(for category: String, completion: @escaping ([New]) -> Void) {
+        apiCaller.getTopStories(for: category) { result in
             switch result {
             case .success(let newsData):
-                self.breakingNews = newsData
+                if category == "home" {
+                    self.breakingNews = newsData
+                } else if category == "technology" {
+                    self.recommendations = newsData
+                }
                 completion(newsData)
             case .failure(let error):
-                print("fetch Breaking News Error: \(error.localizedDescription)")
+                print("fetch News for \(category.capitalized) Error: \(error.localizedDescription)")
                 completion([])
             }
         }
     }
 
+    func fetchBreakingNews(completion: @escaping ([New]) -> Void) {
+        fetchNews(for: "home", completion: completion)
+    }
+
     func fetchRecommendations(completion: @escaping ([New]) -> Void) {
-        apiCaller.getTopStoriesTech { result in
-            switch result {
-            case .success(let newsData):
-                self.recommendations = newsData
-                completion(newsData)
-            case .failure(let error):
-                print("fetch Recommendation Error: \(error.localizedDescription)")
-                completion([])
-            }
-        }
+        fetchNews(for: "technology", completion: completion)
     }
     
     func breakingNewsItem(at index: Int) -> New? {

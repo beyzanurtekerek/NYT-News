@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+// buraya kadar
 struct Constants {
     static let API_KEY = Config.apiKey
     static let baseURL = "https://api.nytimes.com/svc/"
@@ -17,8 +17,7 @@ enum APIError: Error {
 }
 
 protocol NewsAPI {
-    func getTopStoriesHome(completion: @escaping (Result<[New], Error>) -> Void)
-    func getTopStoriesTech(completion: @escaping (Result<[New], Error>) -> Void)
+    func getTopStories(for category: String, completion: @escaping (Result<[New], Error>) -> Void)
     func search(with query: String, completion: @escaping (Result<[Doc], Error>) -> Void)
     func fetchNews(for category: String, completion: @escaping (Result<[New], Error>) -> Void)
 }
@@ -27,24 +26,14 @@ class APICaller: NewsAPI {
     
     static let shared = APICaller()
     
-    func getTopStoriesHome(completion: @escaping (Result<[New], Error>) -> Void) {
-        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/home.json?api-key=\(Constants.API_KEY)") else { return }
+    func getTopStories(for category: String, completion: @escaping (Result<[New], Error>) -> Void) {
+        let categoryLowercased = category.lowercased()
+        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/\(categoryLowercased).json?api-key=\(Constants.API_KEY)") else { return }
         let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
-            guard let data = data, error == nil else { return }
-            do {
-                let result = try JSONDecoder().decode(NewResponse.self, from: data)
-                completion(.success(result.results))
-            } catch {
+            guard let data = data, error == nil else {
                 completion(.failure(APIError.failedToGetData))
+                return
             }
-        }
-        task.resume()
-    }
-    
-    func getTopStoriesTech(completion: @escaping (Result<[New], Error>) -> Void) {
-        guard let url = URL(string: "\(Constants.baseURL)topstories/v2/technology.json?api-key=\(Constants.API_KEY)") else { return }
-        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
-            guard let data = data, error == nil else { return }
             do {
                 let result = try JSONDecoder().decode(NewResponse.self, from: data)
                 completion(.success(result.results))
