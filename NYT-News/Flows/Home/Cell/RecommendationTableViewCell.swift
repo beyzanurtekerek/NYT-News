@@ -9,7 +9,7 @@ import UIKit
 import SDWebImage
 
 class RecommendationTableViewCell: UITableViewCell {
-
+    
     static let identifier = "RecommendationTableViewCell"
     
     private let containerView: UIView = {
@@ -56,7 +56,7 @@ class RecommendationTableViewCell: UITableViewCell {
         label.textColor = .lightGray
         return label
     }()
-
+    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -107,11 +107,15 @@ class RecommendationTableViewCell: UITableViewCell {
             dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: containerView.bottomAnchor, constant: -10)
         ]
         
-        NSLayoutConstraint.activate(containerConstraints)
-        NSLayoutConstraint.activate(populerImageViewConstraints)
-        NSLayoutConstraint.activate(titleLabelConstraints)
-        NSLayoutConstraint.activate(bylineLabelConstraints)
-        NSLayoutConstraint.activate(dateLabelConstraints)
+        let allConstraints = [
+            containerConstraints,
+            populerImageViewConstraints,
+            titleLabelConstraints,
+            bylineLabelConstraints,
+            dateLabelConstraints
+        ].flatMap { $0 }
+        
+        NSLayoutConstraint.activate(allConstraints)
     }
     
     public func configureWithNews(with model: New) {
@@ -120,7 +124,7 @@ class RecommendationTableViewCell: UITableViewCell {
         
         titleLabel.text = model.title
         bylineLabel.text = "• \(model.byline ?? "Unknown Author")"
-        dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "")
+        dateLabel.text = DateFormatterUtil.formattedDate(from: model.published_date ?? "Unknown Date")
         populerImageView.sd_setImage(with: url)
     }
     
