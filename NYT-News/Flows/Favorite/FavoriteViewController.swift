@@ -28,6 +28,7 @@ class FavoriteViewController: UIViewController {
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(DiscoverCollectionViewCell.self, forCellWithReuseIdentifier: DiscoverCollectionViewCell.identifier)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
@@ -41,20 +42,17 @@ class FavoriteViewController: UIViewController {
         fetchSavedArticles()
     }
     
+    // FavoriteViewController bellekten silinirken NotificationCenter gözlemcisi de kaldırılıyor. Bu sayede potansiyel memory leak riski ortadan kalkmış oldu
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     @objc func refreshData() {
         viewModel.fetchSavedArticles()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let padding: CGFloat = 16
-        
-        collectionView.frame = CGRect(
-            x: 0,
-            y: titleLabel.frame.maxY + padding,
-            width: view.frame.width,
-            height: view.frame.height - titleLabel.frame.maxY - padding
-        )
     }
     
     // MARK: - UI Setup
@@ -76,8 +74,15 @@ class FavoriteViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ]
+        let collectionViewConstraints = [
+            collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
+        ]
         
         NSLayoutConstraint.activate(titleLabelConstraints)
+        NSLayoutConstraint.activate(collectionViewConstraints)
     }
     
     // MARK: - Data Fetching
