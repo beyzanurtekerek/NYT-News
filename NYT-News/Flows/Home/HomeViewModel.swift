@@ -40,11 +40,11 @@ class HomeViewModel {
             }
         }
     }
-
+    
     func fetchBreakingNews(completion: @escaping ([New]) -> Void) {
         fetchNews(for: .home, completion: completion)
     }
-
+    
     func fetchRecommendations(completion: @escaping ([New]) -> Void) {
         fetchNews(for: .technology, completion: completion)
     }
