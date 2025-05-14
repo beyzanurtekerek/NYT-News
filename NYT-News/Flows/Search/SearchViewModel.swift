@@ -31,7 +31,7 @@ class SearchViewModel {
     
     func fetchInitialCategoryNews() {
         let selectedCategory = categories[selectedCategoryIndex]
-        APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+        APICaller.shared.getTopStories(for: selectedCategory) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let news):
@@ -47,7 +47,7 @@ class SearchViewModel {
     func didSelectCategory(at index: Int, completion: @escaping () -> Void) {
         selectedCategoryIndex = index
         let selectedCategory = categories[selectedCategoryIndex]
-        APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+        APICaller.shared.getTopStories(for: selectedCategory) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let news):
@@ -69,7 +69,7 @@ class SearchViewModel {
     func performSearch(with searchText: String, completion: @escaping () -> Void) {
         guard !searchText.isEmpty else {
             let selectedCategory = categories[selectedCategoryIndex]
-            APICaller.shared.fetchNews(for: selectedCategory) { [weak self] result in
+            APICaller.shared.getTopStories(for: selectedCategory) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let news):
