@@ -99,6 +99,7 @@ class DiscoverCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         
         searchImageView.image = nil
+        searchImageView.sd_cancelCurrentImageLoad()
         headlineLabel.text = nil
         abstractlabel.text = nil
         dateLabel.text = nil
