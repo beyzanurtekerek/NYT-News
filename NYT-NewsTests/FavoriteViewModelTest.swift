@@ -42,29 +42,37 @@ class FavoriteViewModelTests: XCTestCase {
         
         waitForExpectations(timeout: 2, handler: nil)
     }
-//    func testSaveArticle() {
-//        if let article = viewModel.savedArticles.first {
-//            viewModel.toggleSaveStatus(for: article, indexPath: IndexPath(row: 0, section: 0))
-//            XCTAssertTrue(mockDelegate.showToastCalled, "ShowToast should be called when article is saved successfully.")
-//        } else {
-//            XCTFail("No saved articles to delete.")
-//        }
-//    }
-//    
-//    func testDeleteArticle() {
-//        if let article = viewModel.savedArticles.first {
-//            viewModel.toggleSaveStatus(for: article, indexPath: IndexPath(row: 0, section: 0))
-//            XCTAssertTrue(mockDelegate.showToastCalled, "ShowToast should be called when article is unsaved successfully.")
-//        } else {
-//            XCTFail("No saved articles to delete.")
-//        }
-//    }
+    //    func testSaveArticle() {
+    //        if let article = viewModel.savedArticles.first {
+    //            viewModel.toggleSaveStatus(for: article, indexPath: IndexPath(row: 0, section: 0))
+    //            XCTAssertTrue(mockDelegate.showToastCalled, "ShowToast should be called when article is saved successfully.")
+    //        } else {
+    //            XCTFail("No saved articles to delete.")
+    //        }
+    //    }
+    //
+    //    func testDeleteArticle() {
+    //        if let article = viewModel.savedArticles.first {
+    //            viewModel.toggleSaveStatus(for: article, indexPath: IndexPath(row: 0, section: 0))
+    //            XCTAssertTrue(mockDelegate.showToastCalled, "ShowToast should be called when article is unsaved successfully.")
+    //        } else {
+    //            XCTFail("No saved articles to delete.")
+    //        }
+    //    }
 }
 
 // Mock Delegate
 class MockFavoriteViewModelDelegate: FavoriteViewModelDelegate {
+    var didFetchSavedArticlesCalled = false
+    var fetchedArticles: [SavedArticle] = []
+    
     var didUpdateArticlesCalled = false
     var showToastCalled = false
+    
+    func didFetchSavedArticles(_ articles: [SavedArticle]) {
+        didFetchSavedArticlesCalled = true
+        fetchedArticles = articles
+    }
     
     func didUpdateArticles() {
         didUpdateArticlesCalled = true

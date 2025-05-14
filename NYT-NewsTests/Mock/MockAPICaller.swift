@@ -14,15 +14,7 @@ final class MockAPICaller: APICaller {
     var mockNews: [New] = []
     var mockDocs: [Doc] = []
 
-    override func getTopStoriesHome(completion: @escaping (Result<[New], Error>) -> Void) {
-        if shouldReturnError {
-            completion(.failure(APIError.failedToGetData))
-        } else {
-            completion(.success(mockNews))
-        }
-    }
-    
-    override func getTopStoriesTech(completion: @escaping (Result<[New], Error>) -> Void) {
+    override func getTopStories(for category: String, completion: @escaping (Result<[New], Error>) -> Void) {
         if shouldReturnError {
             completion(.failure(APIError.failedToGetData))
         } else {
@@ -35,14 +27,6 @@ final class MockAPICaller: APICaller {
             completion(.failure(APIError.failedToGetData))
         } else {
             completion(.success(mockDocs))
-        }
-    }
-
-    override func fetchNews(for category: String, completion: @escaping (Result<[New], Error>) -> Void) {
-        if shouldReturnError {
-            completion(.failure(APIError.failedToGetData))
-        } else {
-            completion(.success(mockNews))
         }
     }
 }
