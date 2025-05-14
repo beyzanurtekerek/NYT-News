@@ -153,19 +153,10 @@ class HomeViewController: UIViewController {
     }
     
     // MARK: - Navigation
-    private func navigateToBreakingNewsDetail(at index: Int) {
-        guard let selectedNews = viewModel.breakingNewsItem(at: index) else { return }
+    private func navigateToDetail(with news: New) {
         let vc = HomeDetailViewController()
-        vc.news = selectedNews
-        vc.configureWithNews(with: selectedNews)
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func navigateToRecommendationDetail(at index: Int) {
-        let selectedNews = recommendations[index]
-        let vc = HomeDetailViewController()
-        vc.news = selectedNews
-        vc.configureWithNews(with: selectedNews)
+        vc.news = news
+        vc.configureWithNews(with: news)
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -203,7 +194,8 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        navigateToBreakingNewsDetail(at: indexPath.row)
+        guard let selectedNews = viewModel.breakingNewsItem(at: indexPath.row) else { return }
+        navigateToDetail(with: selectedNews)
     }
 }
 
@@ -232,6 +224,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigateToRecommendationDetail(at: indexPath.row)
+        guard let selectedNews = viewModel.recommendationItem(at: indexPath.row) else { return }
+        navigateToDetail(with: selectedNews)
     }
 }
